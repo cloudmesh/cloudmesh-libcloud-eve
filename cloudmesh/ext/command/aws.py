@@ -1,6 +1,10 @@
 from __future__ import print_function
 from cloudmesh.shell.command import command
 from cloudmesh.shell.command import PluginCommand
+from cloudmesh.api.aws_client import Aws
+import os
+from cloudmesh.common.ConfigDict import ConfigDict
+from cloudmesh.common.StopWatch import StopWatch
 
 
 class AwsCommand(PluginCommand):
@@ -11,20 +15,41 @@ class AwsCommand(PluginCommand):
         ::
 
           Usage:
-                command -f FILE
-                command FILE
-                command list
+            aws api URL
+            aws image list
+            aws container create NAME IMAGE
+            aws container start NAME
+            aws container stop NAME
+            aws container list
+            aws container delete NAME
+            aws container attach NAME
+            aws container pause NAME
+            aws container unpause NAME
+            aws process config CNAME
 
-          This command does some useful things.
-
+  
           Arguments:
-              FILE   a file name
+            NAME     The name of the aws
+            CLOUD    The name of the cloud on which the virtual aws
+                     is to be deployed
+            IMAGE    Docker server images
+            URL      URL of aws API
+            CNAME    Config File Name
 
           Options:
-              -f      specify the file
+            -v       verbose mode
+
+          Description:
+            Manages a virtual aws on a cloud
 
         """
-        print(arguments)
+
+        stopwatch = StopWatch()
+        stopwatch.start('E2E')
 
 
+        if arguments.image and arguments.list :
+            aws = Aws()
+            aws.images_list()
+            return
 
