@@ -9,6 +9,7 @@ import os
 import sys
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
+from cloudmesh.api.mogo_eve_client import post_people
 #import yaml
 
 class Aws(object):
@@ -51,3 +52,7 @@ class Aws(object):
 
         return
         
+    def key_add(self):
+        print("======Adding key=========")
+        post_people()
+        print("======key Added=========")

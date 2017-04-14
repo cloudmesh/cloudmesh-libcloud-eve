@@ -18,6 +18,7 @@ class AwsCommand(PluginCommand):
             aws api URL
             aws image list
             aws flavor list
+            aws add key
             aws container create NAME IMAGE
             aws container start NAME
             aws container stop NAME
@@ -56,3 +57,7 @@ class AwsCommand(PluginCommand):
         if arguments.flavor and arguments.list :
             aws.flavor_list()
             return
+
+        if arguments.add and arguments.key :
+          aws.key_add()
+          return
