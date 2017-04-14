@@ -17,6 +17,7 @@ class AwsCommand(PluginCommand):
           Usage:
             aws api URL
             aws image list
+            aws flavor list
             aws container create NAME IMAGE
             aws container start NAME
             aws container stop NAME
@@ -46,10 +47,12 @@ class AwsCommand(PluginCommand):
 
         stopwatch = StopWatch()
         stopwatch.start('E2E')
-
+        aws = Aws()
 
         if arguments.image and arguments.list :
-            aws = Aws()
             aws.images_list()
             return
 
+        if arguments.flavor and arguments.list :
+            aws.flavor_list()
+            return

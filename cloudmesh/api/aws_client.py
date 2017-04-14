@@ -9,15 +9,19 @@ import os
 import sys
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-import yaml
+#import yaml
 
 class Aws(object):
     def __init__(self):
         #self.client = docker.from_env()
-        f = open("cloudmesh/api/aws.yml");
-        self.Constants = yaml.safe_load(f)
-        f.close()
+        #f = open("cloudmesh/api/aws.yml");
+        #self.Constants = yaml.safe_load(f)
+        #f.close()
         #print(self.Constants["user_details"]["ACCESS_ID"])
+        cls = get_driver(Provider.EC2)
+        global driver
+        driver = cls("ACCESS_ID", "SECRET_KEY", region="us-west-1")
+       
         print("TODO")
 
     def images_list(self):
@@ -27,19 +31,23 @@ class Aws(object):
         :rtype: NoneType
 
         """
-        cls = get_driver(Provider.EC2)
-        driver = cls(self.Constants["user_details"]["ACCESS_ID"], self.Constants["user_details"]["SECRET_KEY"], region="us-west-1")
+        #driver = cls(self.Constants["user_details"]["ACCESS_ID"], self.Constants["user_details"]["SECRET_KEY"], region="us-west-1")
 
-        sizes = driver.list_sizes()
         images = driver.list_images()
         print("List of images--------------")
         print(images)
-        print("TODO")
         #size = [s for s in sizes if s.id == 'performance1-1'][0]
         #image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
 
         #node = driver.create_node(name='libcloud', size=size, image=image)
         print("The Node is ---------------")
         #print(node)
+        return
 
+    def flavor_list(self):
+        print("=============SIZES/flavors============")
+        sizes = driver.list_sizes()
+        print(sizes)
 
+        return
+        
