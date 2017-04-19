@@ -90,6 +90,6 @@ json:
 	cat $(ROOT_DIR)/settings.py
 
 install:
-	cd ../common; python setup.py install; pip install .
-	cd ../cmd5; python setup.py install; pip install .
+	cd ../cloudmesh.common; python setup.py install; pip install .
+	cd ../cloudmesh.cmd5; python setup.py install; pip install .
 	python setup.py install; pip install .

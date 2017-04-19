@@ -1,0 +1,8 @@
+aws:
+  credentials:
+    EC2_ACCESS_KEY: 'ACCESS KEY'
+    EC2_SECRET_KEY: 'SECRET KEY'
+  default:
+    image: 'IMAGE ID'
+    size: 'SIZE ID'
+    region: 'REGION'

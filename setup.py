@@ -31,6 +31,9 @@ tox
 detox
 coverage
 flake8
+requests
+apache-libcloud
+pyyaml
 """.split("\n")
 
 # dependency_links = ['http://github.com/nicolaiarocci/eve.git@develop']

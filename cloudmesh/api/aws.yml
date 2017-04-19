@@ -1,7 +1,0 @@
-#Useful credential
-
-user_details:
-    ACCESS_ID: 'AKIAJ2X72FT2JBSBKF2A'
-    SECRET_KEY:  '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'
-    IMAGE_ID: 'ami-c8052d8d'
-    SIZE_ID: 't1.micro'
