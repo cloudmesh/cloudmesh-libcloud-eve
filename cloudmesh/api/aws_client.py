@@ -1,16 +1,31 @@
 #!/usr/bin/env python
+
+#######################################################################
+# Import libraries
+#######################################################################
+
+# system modules
 from __future__ import print_function
-import cloudmesh
-#import libcloud
 import os
-#import requests
-#import json
 import sys
+
+# Yaml modules
+import yaml
+#from cloudmesh.common.ConfigDict import ConfigDict # doesn't work
+
+# AWS connection modules
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-from cloudmesh.api.mogo_eve_client import post_people
-#from cloudmesh.common.ConfigDict import ConfigDict # doesn't work
-import yaml
+
+# Cloudmesh modules
+import cloudmesh
+from cloudmesh.common.console import Console
+from cloudmesh.common.Printer import Printer
+
+# Database modules
+import json
+from cloudmesh.api.evemongo_client import perform_post ,perform_delete,perform_get
+
 #######################################################################
 
 
@@ -21,13 +36,19 @@ class Aws(object):
         self.configd = yaml.safe_load(f)
         f.close()
         # doesn't work
-        #configd = ConfigDict("aws_bak.yml",
+        #self.configd = ConfigDict("aws_bak.yml",
         #    verbose=True,load_order=[config_path])
-        #cls = get_driver(Provider.EC2)
-        #self.driver = cls(configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
-        #    configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
-        #    region = configd["aws"]["default"]["region"])
-       
+    
+    def _get_driver(self):
+
+        # get driver
+        cls = get_driver(Provider.EC2)
+        driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
+            self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
+            region = self.configd["aws"]["default"]["region"])
+
+        return driver
+   
     def images_list(self):
         """List of amazon images
         
@@ -35,13 +56,8 @@ class Aws(object):
         :rtype: NoneType
 
         """
-        #print(self.configd)
-
         # get driver
-        cls = get_driver(Provider.EC2)
-        driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
-            self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
-            region = self.configd["aws"]["default"]["region"])
+        driver = self._get_driver()
 
         # TODO : check local db
 
@@ -59,11 +75,8 @@ class Aws(object):
     def flavor_list(self):
         print("=============SIZES/flavors============")
 
-        # get driver
-        cls = get_driver(Provider.EC2)
-        driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
-            self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
-            region = self.configd["aws"]["default"]["region"])
+        #get driver
+        driver = self._get_driver()
 
         # TODO : check local db before fetching
         # get flavor list and print
@@ -76,16 +89,14 @@ class Aws(object):
         
     def key_add(self):
         print("======Adding key=========")
-        post_people()
+        #post_people()
         print("======key Added=========")
         return
 
     def node_create(self):
+
         # get driver
-        cls = get_driver(Provider.EC2)
-        driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
-            self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
-            region = self.configd["aws"]["default"]["region"])
+        driver = self._get_driver()
 
         # create node
         #node = driver.create_node(name='libcloud', size=size, image=image)
