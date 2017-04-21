@@ -16,27 +16,17 @@ class AwsCommand(PluginCommand):
 
           Usage:
             aws api URL
-            aws image list
-            aws flavor list
+            aws image list [--format=FORMAT]
+            aws flavor list [--format=FORMAT]
+            aws vm list [--format=FORMAT]
             aws add key
-            aws container create NAME IMAGE
-            aws container start NAME
-            aws container stop NAME
-            aws container list
-            aws container delete NAME
-            aws container attach NAME
-            aws container pause NAME
-            aws container unpause NAME
-            aws process config CNAME
-
+            aws vm boot 
+            
   
           Arguments:
             NAME     The name of the aws
-            CLOUD    The name of the cloud on which the virtual aws
-                     is to be deployed
-            IMAGE    Docker server images
             URL      URL of aws API
-            CNAME    Config File Name
+            FORMAT   The format in which to print the data
 
           Options:
             -v       verbose mode
@@ -44,6 +34,7 @@ class AwsCommand(PluginCommand):
           Description:
             Manages a virtual aws on a cloud
 
+            to complete the command see the man page of cm boot help
         """
 
         stopwatch = StopWatch()
@@ -56,6 +47,10 @@ class AwsCommand(PluginCommand):
 
         if arguments.flavor and arguments.list :
             aws.flavor_list()
+            return
+
+        if arguments.vm and arguments.list :
+            # aws.vm_list()
             return
 
         if arguments.add and arguments.key :
