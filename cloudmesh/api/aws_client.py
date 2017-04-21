@@ -38,11 +38,21 @@ class Aws(object):
         # doesn't work
         #self.configd = ConfigDict("aws_bak.yml",
         #    verbose=True,load_order=[config_path])
-    
+
+        #self.configd = ConfigDict("cloudmesh.yaml",
+        #    verbose=True,load_order=[config_path])
+
+
     def _get_driver(self):
 
         # get driver
         cls = get_driver(Provider.EC2)
+
+        # credentials = self.configd["aws"]["credentials"]
+        # than you can use credentials["EC2_ACCESS_KEY"]
+        # this would be more readable
+        # i do not think you need \
+
         driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
             self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
             region = self.configd["aws"]["default"]["region"])
@@ -69,6 +79,8 @@ class Aws(object):
         # TODO : parse list
         #size = [s for s in sizes if s.id == 'performance1-1'][0]
         #image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
+
+        # see code in cloudmesh.openstack for similar code
 
         return
 
