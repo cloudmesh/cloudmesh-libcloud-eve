@@ -67,7 +67,11 @@ class Aws(object):
 
         """
         #Fetch the list of images from db
-        print("fetch images list")
+        db_client = Pymongo_client()
+        data = db_client.get_images()
+        
+        for d in data:
+            print(d)
 
         # TODO : parse list
        
@@ -89,20 +93,26 @@ class Aws(object):
 
         # get image list and print
         images = driver.list_images()
-        image = images[0]
-        sizes = db_client.get_flavors()
-        size = sizes[0]
         print("List of images--------------")
         print(images)
-
+        db_client = Pymongo_client()
+        n =0 ;
         # TODO : parse list
-        #size = [s for s in sizes if s.id == 'performance1-1'][0]
-        #image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
+        for image in images:
+            # parse flavors
+            data = {}
+            data['id'] = str(image .id)
+            data['name'] = str(image.name)
+            # store it in mongodb
+            r = db_client.post_images(data)
+            print(data) 
+            n = n +1
+            if n == 100:
+                break
+
 
         # see code in cloudmesh.openstack for similar code
-        print("======Creating node ============")
-        node = driver.create_node(name='libcloud', size=size, image=image)
-        print(node)
+        
         return
 
     def flavor_list(self):

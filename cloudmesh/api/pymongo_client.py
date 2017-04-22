@@ -32,6 +32,18 @@ class Pymongo_client(object):
         db = client[self.db]
         return db
 
+    def post_images(self, data):
+        db = self._get_db_connect()
+        collection = db.images
+        result = collection.insert_one(data)
+        return result
+
+    def get_images(self):
+        db = self._get_db_connect()
+        collection = db.images
+        result = collection.find()
+        return result
+
     def post_flavor(self, data):
         db = self._get_db_connect()
         collection = db.flavor
