@@ -6,3 +6,7 @@ aws:
     image: 'IMAGE ID'
     size: 'SIZE ID'
     region: 'REGION'
+  mongodb:
+    host: 'localhost'
+    port: '27017'
+    database: 'aws'

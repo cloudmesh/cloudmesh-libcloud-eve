@@ -24,7 +24,7 @@ from cloudmesh.common.Printer import Printer
 
 # Database modules
 import json
-from cloudmesh.api.evemongo_client import perform_post ,perform_delete,perform_get
+from cloudmesh.api.pymongo_client import Pymongo_client
 
 #######################################################################
 
@@ -93,10 +93,23 @@ class Aws(object):
         # TODO : check local db before fetching
         # get flavor list and print
         sizes = driver.list_sizes()
-        print(sizes)
+        #print(sizes)
 
         # TODO : parse list and store in db
+        db_client = Pymongo_client()
+        for size in sizes:
+            # parse flavors
+            data = {}
+            data['id'] = size .id
+            data['ram'] = size.ram
+            data['disk'] = size.disk
+            data['bandwidth'] = size.bandwidth
+            data['price'] = size.price
 
+            # store it in mongodb
+            db_client.post_flavor(data)
+        
+        print("successfully stored in db")
         return
         
     def key_add(self):
