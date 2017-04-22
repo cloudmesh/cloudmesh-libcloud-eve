@@ -17,7 +17,9 @@ class AwsCommand(PluginCommand):
           Usage:
             aws api URL
             aws image list [--format=FORMAT]
+            aws image refresh
             aws flavor list [--format=FORMAT]
+            aws flavor refresh
             aws vm list [--format=FORMAT]
             aws add key
             aws vm boot 
@@ -44,9 +46,17 @@ class AwsCommand(PluginCommand):
         if arguments.image and arguments.list :
             aws.images_list()
             return
+            
+        if arguments.image and arguments.refresh :
+            aws.images_refresh()
+            return
 
         if arguments.flavor and arguments.list :
             aws.flavor_list()
+            return
+
+        if arguments.flavor and arguments.refresh :
+            aws.flavor_refresh()
             return
 
         if arguments.vm and arguments.list :

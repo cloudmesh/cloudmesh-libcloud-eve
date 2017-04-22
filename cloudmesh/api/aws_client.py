@@ -32,7 +32,7 @@ from cloudmesh.api.pymongo_client import Pymongo_client
 class Aws(object):
     def __init__(self):
         config_path = os.getcwd() + "/config"
-        f = open(config_path + "/aws_bak.yml")
+        f = open(config_path + "/aws.yml")
         self.configd = yaml.safe_load(f)
         f.close()
         # doesn't work
@@ -60,8 +60,24 @@ class Aws(object):
         return driver
    
     def images_list(self):
+        """List of amazon images 
+        from mongodb
+        :returns: image list objects
+        :rtype: NoneType
+
+        """
+        #Fetch the list of images from db
+        print("fetch images list")
+
+        # TODO : parse list
+       
+         #print on console
+
+        return
+
+    def images_refresh(self):
         """List of amazon images
-        
+        get store it in db
         :returns: None
         :rtype: NoneType
 
@@ -73,6 +89,9 @@ class Aws(object):
 
         # get image list and print
         images = driver.list_images()
+        image = images[0]
+        sizes = db_client.get_flavors()
+        size = sizes[0]
         print("List of images--------------")
         print(images)
 
@@ -81,10 +100,30 @@ class Aws(object):
         #image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
 
         # see code in cloudmesh.openstack for similar code
-
+        print("======Creating node ============")
+        node = driver.create_node(name='libcloud', size=size, image=image)
+        print(node)
         return
 
     def flavor_list(self):
+        
+        """List of amazon images
+        get store it in db
+        :returns: flavor list object
+        :rtype: NoneType
+
+        """
+        #fetch the list from db, parse and print
+        db_client = Pymongo_client()
+        data = db_client.get_flavors()
+
+        for d in data:
+            print(d)
+        
+       
+        return
+        
+    def flavor_refresh(self):
         print("=============SIZES/flavors============")
 
         #get driver
@@ -105,17 +144,36 @@ class Aws(object):
             data['disk'] = size.disk
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
-
             # store it in mongodb
-            db_client.post_flavor(data)
+            r = db_client.post_flavor(data)
+            print(data)    
         
-        print("successfully stored in db")
+        print("successfully stored in db", r)
         return
         
+
     def key_add(self):
+        db_client = Pymongo_client()
+        data = {}
+        data['name'] = "sam"
+        data['ram'] = "16gb"
         print("======Adding key=========")
-        #post_people()
-        print("======key Added=========")
+
+        db_client.post_test(data)
+        print("======key Added Now Print=========")
+        db_client.get_test()
+        print("======Printed=========", db_client.get_test())
+        return
+
+    def node_list(self):
+
+        # get driver
+        driver = self._get_driver()
+
+        # create node
+        #node = driver.create_node(name='libcloud', size=size, image=image)
+        print("The Node is ---------------")
+        #print(node)
         return
 
     def node_create(self):
@@ -128,4 +186,3 @@ class Aws(object):
         print("The Node is ---------------")
         #print(node)
         return
-

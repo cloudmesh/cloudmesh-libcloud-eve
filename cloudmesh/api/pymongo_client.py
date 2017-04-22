@@ -20,7 +20,7 @@ class Pymongo_client(object):
     def __init__(self):
         # get mongodb host configuration
         config_path = os.getcwd() + "/config"
-        f = open(config_path + "/aws_bak.yml")
+        f = open(config_path + "/aws.yml")
         configd = yaml.safe_load(f)
         f.close()
         self.host = configd["aws"]["mongodb"]["host"]
@@ -38,6 +38,12 @@ class Pymongo_client(object):
         result = collection.insert_one(data)
         return result
 
+    def get_flavors(self):
+        db = self._get_db_connect()
+        collection = db.flavor
+        result = collection.find()
+        return result
+
     def post_multiple(self, data_list):
         db = self._get_db_connect()
         posts = db.posts
@@ -45,3 +51,15 @@ class Pymongo_client(object):
         #print('One post: {0}'.format(result.inserted_id))
         return result
 
+    def post_test(self, data):
+        db = self._get_db_connect()
+        tdata = db.test 
+        result = tdata.insert_one(data)
+        return result
+
+
+    def get_test(self):
+        db = self._get_db_connect()
+        tdata = db.test 
+        result = tdata.find_one()
+        return result
