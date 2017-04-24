@@ -22,6 +22,10 @@ import cloudmesh
 from cloudmesh.common.console import Console
 from cloudmesh.common.Printer import Printer
 
+#Console printing packages
+from cloudmesh.common.console import Console
+from cloudmesh.common.Printer import Printer
+
 # Database modules
 import json
 from cloudmesh.api.pymongo_client import Pymongo_client
@@ -74,8 +78,13 @@ class Aws(object):
             print("No image found")
         else:"""
         #parse and print it on console
-        for image in images:
-            print(image)
+        n= 1
+        e = {}
+        for d in images:
+            e[n] = d
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
         return
 
     def images_refresh(self):
@@ -91,26 +100,28 @@ class Aws(object):
         # get image list and print
         images = driver.list_images()
         db_client = Pymongo_client()
-        n =0 ;
+       
         if len(images) == 0:
             print("Error in fetching new list ...Showing existing images")
             self.images_list()
         else:
             r = db_client.delete("images")
-            print("removed obj: ",r)
+            n =0 ;
+            e = {}
             for image in images:
                 # parse flavors
                 data = {}
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
+                data['driver'] = str(image.name)
                 # store it in mongodb
                 r = db_client.post_images(data)
-                print(data) 
-                n = n +1  
-                #Test the least data   
+                e[n] = data
+                n = n + 1
                 if n == 10:
                     break
-            print("List of images--------------")
+                
+            Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
             print(images)
 
         return
@@ -126,10 +137,13 @@ class Aws(object):
         #fetch the list from db, parse and print
         db_client = Pymongo_client()
         data = db_client.get_flavors()
-
+        n= 1
+        e = {}
         for d in data:
-            print(d)
-        
+            e[n] = d
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['id', 'ram', 'disk', 'bandwidth','price'])))
        
         return
         
@@ -143,8 +157,8 @@ class Aws(object):
         # get flavor list and print
         sizes = driver.list_sizes()
         #print(sizes)
-
-        # TODO : parse list and store in db
+        n = 1   
+        e = {}
         db_client = Pymongo_client()
         for size in sizes:
             # parse flavors
@@ -154,25 +168,22 @@ class Aws(object):
             data['disk'] = size.disk
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
+            e[n] = data
+            n = n + 1
             # store it in mongodb
             r = db_client.post_flavor(data)
-            print(data)    
+            #print(data)    
         
+        Console.ok(str(Printer.dict_table(e, order=['id', 'ram', 'disk', 'bandwidth','price'])))
+
         print("successfully stored in db", r)
         return
         
 
     def key_add(self):
         db_client = Pymongo_client()
-        data = {}
-        data['name'] = "sam"
-        data['ram'] = "16gb"
-        print("======Adding key=========")
-
-        db_client.post_test(data)
-        print("======key Added Now Print=========")
-        db_client.get_test()
-        print("======Printed=========", db_client.get_test())
+        #Some test functionality
+        print("======Printed added key=========")
         return
 
     def node_list(self):
@@ -190,9 +201,10 @@ class Aws(object):
 
         # get driver
         driver = self._get_driver()
-
+        images = driver.list_images()
+        sizes = driver.list_sizes()
         # create node
-        #node = driver.create_node(name='libcloud', size=size, image=image)
-        print("The Node is ---------------")
+        node = driver.create_node(name='Test', size=sizes[0] , image=images[0])
+        print("The Node is Created --------------- :: ",node)
         #print(node)
         return
