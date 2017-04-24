@@ -69,6 +69,10 @@ class Pymongo_client(object):
         result = tdata.insert_one(data)
         return result
 
+    def delete(self, data):
+        db = self._get_db_connect()
+        result = db.data.delete_many({}) 
+        return result
 
     def get_test(self):
         db = self._get_db_connect()

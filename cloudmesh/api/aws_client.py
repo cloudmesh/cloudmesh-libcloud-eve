@@ -68,15 +68,14 @@ class Aws(object):
         """
         #Fetch the list of images from db
         db_client = Pymongo_client()
-        data = db_client.get_images()
-        
-        for d in data:
-            print(d)
-
-        # TODO : parse list
-       
-         #print on console
-
+        images = db_client.get_images()
+        """
+        if len(images) == 0:
+            print("No image found")
+        else:"""
+        #parse and print it on console
+        for image in images:
+            print(image)
         return
 
     def images_refresh(self):
@@ -89,30 +88,31 @@ class Aws(object):
         # get driver
         driver = self._get_driver()
 
-        # TODO : check local db
-
         # get image list and print
         images = driver.list_images()
-        print("List of images--------------")
-        print(images)
         db_client = Pymongo_client()
         n =0 ;
-        # TODO : parse list
-        for image in images:
-            # parse flavors
-            data = {}
-            data['id'] = str(image .id)
-            data['name'] = str(image.name)
-            # store it in mongodb
-            r = db_client.post_images(data)
-            print(data) 
-            n = n +1
-            if n == 100:
-                break
+        if len(images) == 0:
+            print("Error in fetching new list ...Showing existing images")
+            self.images_list()
+        else:
+            r = db_client.delete("images")
+            print("removed obj: ",r)
+            for image in images:
+                # parse flavors
+                data = {}
+                data['id'] = str(image .id)
+                data['name'] = str(image.name)
+                # store it in mongodb
+                r = db_client.post_images(data)
+                print(data) 
+                n = n +1  
+                #Test the least data   
+                if n == 10:
+                    break
+            print("List of images--------------")
+            print(images)
 
-
-        # see code in cloudmesh.openstack for similar code
-        
         return
 
     def flavor_list(self):
