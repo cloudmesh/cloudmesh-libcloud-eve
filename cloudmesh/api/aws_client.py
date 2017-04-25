@@ -189,22 +189,50 @@ class Aws(object):
     def node_list(self):
 
         # get driver
+        print("getting vm list")
         driver = self._get_driver()
-
-        # create node
-        #node = driver.create_node(name='libcloud', size=size, image=image)
-        print("The Node is ---------------")
-        #print(node)
-        return
+        #List the running vm's
+        nodes = driver.list_nodes()
+        print("The Node is ---------------",nodes)
+        return nodes
 
     def node_create(self):
 
         # get driver
         driver = self._get_driver()
-        images = driver.list_images()
+        # Image with Netflix Asgard available in us-west-1 region
+        # https://github.com/Answers4AWS/netflixoss-ansible/wiki/AMIs-for-NetflixOSS
+        AMI_ID = 'ami-c8052d8d'
+        
+        # Name of the existing keypair you want to use
+        KEYPAIR_NAME = 'test1'
+        # A list of security groups you want this node to be added to
+        SECURITY_GROUP_NAMES = ['default']
+        
+        print("getting image and size")
+        #images = driver.list_images()
         sizes = driver.list_sizes()
+        images = driver.list_images()
+        
+        print("now selecting the image and size")
+        size = [s for s in sizes if s.id == 't2.micro'][0]
+        image = images[500]
+        
+        print("creating the node with image :",image, " :: size:: ", size)
         # create node
-        node = driver.create_node(name='Test', size=sizes[0] , image=images[0])
+        node = driver.create_node(name='test', size=size, image=image,ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
         print("The Node is Created --------------- :: ",node)
         #print(node)
+         
+        return
+    
+    def node_delete(self):
+        # get driver
+        print("getting vm list")
+        driver = self._get_driver()
+        #List the running vm's
+        node = node_list()
+        nodes = driver.destroy_node(node)
+        print("Deleted Node is ---------------",nodes)
+
         return

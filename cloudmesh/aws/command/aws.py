@@ -23,7 +23,7 @@ class AwsCommand(PluginCommand):
             aws vm list [--format=FORMAT]
             aws add key
             aws vm boot 
-            
+            aws vm delete
   
           Arguments:
             NAME     The name of the aws
@@ -60,7 +60,15 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.vm and arguments.list :
-            # aws.vm_list()
+            aws.node_list()
+            return
+
+        if arguments.vm and arguments.boot :
+            aws.node_create()
+            return
+ 
+        if arguments.vm and arguments.delete :
+            aws.node_delete()
             return
 
         if arguments.add and arguments.key :
