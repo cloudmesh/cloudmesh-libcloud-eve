@@ -54,6 +54,14 @@ class Pymongo_client(object):
 
     def delete(self, data):
         db = self._get_db_connect()
-        result = db.data.delete_many({}) 
+        conn = db[data]
+        result = conn.delete_many({}) 
         return result
 
+    def delete_database(self,collection):
+        db = self._get_db_connect()
+        print("Drop Database :: ",db)
+        #db.collection.drop() 
+        n  = db.runCommand( { dropAllUsersFromDatabase: 1 } )
+        print("Delete user :: ",n)
+        return

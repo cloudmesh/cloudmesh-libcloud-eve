@@ -44,7 +44,7 @@ FLAVOR = 'flavors'
 class Aws(object):
     def __init__(self):
         config_path = os.getcwd() + "/config"
-        f = open(config_path + "/aws_bak.yml")
+        f = open(config_path + "/aws.yml")
         self.configd = yaml.safe_load(f)
         f.close()
         # doesn't work
@@ -120,6 +120,7 @@ class Aws(object):
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
                 data['driver'] = str(image.name)
+                data['extra'] = str(image.extra)
                 # store it in mongodb
                 db_client.post_one(IMAGE, data)
                 e[n] = data
@@ -150,7 +151,7 @@ class Aws(object):
             e[n] = d
             n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'ram', 'disk', 'bandwidth','price'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
        
         return
         
@@ -166,14 +167,18 @@ class Aws(object):
         n = 1   
         e = {}
         db_client = Pymongo_client()
+        db_client.delete(FLAVOR)
         for size in sizes:
             # parse flavors
             data = {}
             data['id'] = size .id
+            data['name'] = size.name
             data['ram'] = size.ram
             data['disk'] = size.disk
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
+            data['driver'] = size.driver
+            data['extra'] = size.extra
             e[n] = data
             n = n + 1
             # store it in mongodb
@@ -187,9 +192,20 @@ class Aws(object):
         
 
     def key_add(self):
+        #Some test functionality
+        print("======add key=========")
         db_client = Pymongo_client()
         #Some test functionality
-        print("======Printed added key=========")
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
+       
+        return
+
+    def drop_collections(self):
+        db_client = Pymongo_client()
+        #Some test functionality
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
         return
 
     def node_list(self):
@@ -224,9 +240,19 @@ class Aws(object):
         size = [s for s in sizes if s.id == 't2.micro'][0]
         image = images[500]
         
-        print("creating the node with image :",image, " :: size:: ", size)
+        sz = {}
+        sz['id'] = size .id
+        sz['name'] = size.name
+        sz['ram'] = size.ram
+        sz['disk'] = size.disk
+        sz['bandwidth'] = size.bandwidth
+        sz['price'] = size.price
+        sz['driver'] = size.driver
+        sz['extra'] = size.extra
+
+        print("creating the node with image :",image, " :: size:: ", sz)
         # create node
-        node = driver.create_node(name='test', size=size, image=image,ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
+        node = driver.create_node(name='test1', size=sz, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
         print("The Node is Created --------------- :: ",node)
         #print(node)
          

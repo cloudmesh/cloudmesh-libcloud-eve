@@ -14,7 +14,7 @@ Requirements
 ------------
 
 * Python 2.7.13
-* Ubuntu 16.04/ MAC?
+* Ubuntu 16.04/ MAC OSX EL Capitan
 * AWS account
 
 Installation from source
