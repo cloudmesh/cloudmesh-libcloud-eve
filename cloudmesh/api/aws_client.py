@@ -112,15 +112,15 @@ class Aws(object):
             self.images_list()
         else:
             r = db_client.delete("images")
-            n =0 ;
+            n = 0 ;
             e = {}
             for image in images:
                 # parse flavors
                 data = {}
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
-                data['driver'] = str(image.name)
-                data['extra'] = str(image.extra)
+                data['driver'] = str(image.driver)
+                #data['extra'] = str(image.extra)
                 # store it in mongodb
                 db_client.post_one(IMAGE, data)
                 e[n] = data
@@ -177,7 +177,7 @@ class Aws(object):
             data['disk'] = size.disk
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
-            data['driver'] = size.driver
+            #data['driver'] = size.driver
             data['extra'] = size.extra
             e[n] = data
             n = n + 1
@@ -185,7 +185,7 @@ class Aws(object):
             db_client.post_one(FLAVOR, data)
             #print(data)    
         
-        Console.ok(str(Printer.dict_table(e, order=['id', 'ram', 'disk', 'bandwidth','price'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
 
         #print("successfully stored in db", r)
         return
@@ -248,9 +248,15 @@ class Aws(object):
         sz['bandwidth'] = size.bandwidth
         sz['price'] = size.price
         sz['driver'] = size.driver
-        sz['extra'] = size.extra
+        sz['extra'] = {}
 
-        print("creating the node with image :",image, " :: size:: ", sz)
+        im = {}
+        im['id'] = str(image .id)
+        im['name'] = str(image.name)
+        im['driver'] = image.driver
+        im['extra'] = {}
+
+        print("creating the node with image :",im, " :: size:: ", sz)
         # create node
         node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
         print("The Node is Created --------------- :: ",node)
@@ -260,7 +266,7 @@ class Aws(object):
     
     def node_delete(self):
         # get driver
-        print("getting vm list")
+        #print("getting vm list")
         driver = self._get_driver()
         #List the running vm's
         node = self.node_list()[0]
