@@ -31,12 +31,20 @@ import json
 from cloudmesh.api.pymongo_client import Pymongo_client
 
 #######################################################################
+# GLOBALS
+
+# collections
+IMAGE = 'images'
+FLAVOR = 'flavors'
+
+#######################################################################
+
 
 
 class Aws(object):
     def __init__(self):
         config_path = os.getcwd() + "/config"
-        f = open(config_path + "/aws.yml")
+        f = open(config_path + "/aws_bak.yml")
         self.configd = yaml.safe_load(f)
         f.close()
         # doesn't work
@@ -52,14 +60,12 @@ class Aws(object):
         # get driver
         cls = get_driver(Provider.EC2)
 
-        # credentials = self.configd["aws"]["credentials"]
-        # than you can use credentials["EC2_ACCESS_KEY"]
-        # this would be more readable
-        # i do not think you need \
+        credentials = self.configd["aws"]["credentials"]
+        default = self.configd["aws"]["default"]
 
-        driver = cls(self.configd["aws"]["credentials"]["EC2_ACCESS_KEY"], \
-            self.configd["aws"]["credentials"]["EC2_SECRET_KEY"], \
-            region = self.configd["aws"]["default"]["region"])
+        driver = cls(credentials["EC2_ACCESS_KEY"],
+            credentials["EC2_SECRET_KEY"],
+            region = default["region"])
 
         return driver
    
@@ -72,7 +78,7 @@ class Aws(object):
         """
         #Fetch the list of images from db
         db_client = Pymongo_client()
-        images = db_client.get_images()
+        images = db_client.get_all(IMAGE)
         """
         if len(images) == 0:
             print("No image found")
@@ -115,12 +121,13 @@ class Aws(object):
                 data['name'] = str(image.name)
                 data['driver'] = str(image.name)
                 # store it in mongodb
-                r = db_client.post_images(data)
+                db_client.post_one(IMAGE, data)
                 e[n] = data
                 n = n + 1
                 if n == 10:
                     break
-                
+                #Console.ok(str(Printer.dict(d, order=['id', 'name', 'driver'])))        
+
             Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
             print(images)
 
@@ -136,7 +143,7 @@ class Aws(object):
         """
         #fetch the list from db, parse and print
         db_client = Pymongo_client()
-        data = db_client.get_flavors()
+        data = db_client.get_all(FLAVOR)
         n= 1
         e = {}
         for d in data:
@@ -153,7 +160,6 @@ class Aws(object):
         #get driver
         driver = self._get_driver()
 
-        # TODO : check local db before fetching
         # get flavor list and print
         sizes = driver.list_sizes()
         #print(sizes)
@@ -171,12 +177,12 @@ class Aws(object):
             e[n] = data
             n = n + 1
             # store it in mongodb
-            r = db_client.post_flavor(data)
+            db_client.post_one(FLAVOR, data)
             #print(data)    
         
         Console.ok(str(Printer.dict_table(e, order=['id', 'ram', 'disk', 'bandwidth','price'])))
 
-        print("successfully stored in db", r)
+        #print("successfully stored in db", r)
         return
         
 

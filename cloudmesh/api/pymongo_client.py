@@ -23,37 +23,26 @@ class Pymongo_client(object):
         f = open(config_path + "/aws.yml")
         configd = yaml.safe_load(f)
         f.close()
-        self.host = configd["aws"]["mongodb"]["host"]
-        self.port = (int)(configd["aws"]["mongodb"]["port"])
-        self.db = configd["aws"]["mongodb"]["database"]
+        mongodb = configd["aws"]["mongodb"]
+        self.host = mongodb["host"]
+        self.port = (int)(mongodb["port"])
+        self.db = mongodb["database"]
 
     def _get_db_connect(self):
         client = MongoClient(self.host, self.port)
         db = client[self.db]
         return db
 
-    def post_images(self, data):
+    def post_one(self, collection, data):
         db = self._get_db_connect()
-        collection = db.images
-        result = collection.insert_one(data)
+        conn = db[collection]
+        result = conn.insert_one(data)
         return result
 
-    def get_images(self):
+    def get_all(self, collection):
         db = self._get_db_connect()
-        collection = db.images
-        result = collection.find()
-        return result
-
-    def post_flavor(self, data):
-        db = self._get_db_connect()
-        collection = db.flavor
-        result = collection.insert_one(data)
-        return result
-
-    def get_flavors(self):
-        db = self._get_db_connect()
-        collection = db.flavor
-        result = collection.find()
+        conn = db[collection]
+        result = conn.find()
         return result
 
     def post_multiple(self, data_list):
@@ -63,19 +52,8 @@ class Pymongo_client(object):
         #print('One post: {0}'.format(result.inserted_id))
         return result
 
-    def post_test(self, data):
-        db = self._get_db_connect()
-        tdata = db.test 
-        result = tdata.insert_one(data)
-        return result
-
     def delete(self, data):
         db = self._get_db_connect()
         result = db.data.delete_many({}) 
         return result
 
-    def get_test(self):
-        db = self._get_db_connect()
-        tdata = db.test 
-        result = tdata.find_one()
-        return result
