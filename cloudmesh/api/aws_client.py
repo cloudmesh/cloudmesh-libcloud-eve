@@ -252,7 +252,7 @@ class Aws(object):
 
         print("creating the node with image :",image, " :: size:: ", sz)
         # create node
-        node = driver.create_node(name='test1', size=sz, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
+        node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
         print("The Node is Created --------------- :: ",node)
         #print(node)
          
@@ -263,7 +263,18 @@ class Aws(object):
         print("getting vm list")
         driver = self._get_driver()
         #List the running vm's
-        node = node_list()
+        node = self.node_list()[0]
+        """
+        #node = "<Node: uuid=e257efd0e6763e9fdc04b79a00f5147fcc21ee7a, name=test1, state=RUNNING, public_ips=['54.153.96.91'], private_ips=['172.31.13.22'], provider=Amazon EC2 ...>";//self.node_list()
+        node = {}
+        node['uuid'] = "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a"
+        node['name'] = "test1"
+        node['state'] = "RUNNING"
+        node['public_ips'] = ['54.153.96.91']
+        node['private_ips'] =['172.31.13.22']
+        node['provider'] = "Amazon EC2"
+        """
+        print("Node state :: ",node.public_ips[0], "name of node ::", node.name)
         nodes = driver.destroy_node(node)
         print("Deleted Node is ---------------",nodes)
 
