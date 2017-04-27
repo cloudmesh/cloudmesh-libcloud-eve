@@ -130,7 +130,7 @@ class Aws(object):
                 #Console.ok(str(Printer.dict(d, order=['id', 'name', 'driver'])))        
 
             Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
-            print(images)
+            #print(images)
 
         return
 

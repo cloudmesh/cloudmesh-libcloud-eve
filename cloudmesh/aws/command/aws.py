@@ -5,7 +5,7 @@ from cloudmesh.api.aws_client import Aws
 import os
 from cloudmesh.common.ConfigDict import ConfigDict
 from cloudmesh.common.StopWatch import StopWatch
-
+from cloudmesh.common.default import Default
 
 class AwsCommand(PluginCommand):
 
@@ -16,6 +16,7 @@ class AwsCommand(PluginCommand):
 
           Usage:
             aws api URL
+            aws default image ON
             aws image list [--format=FORMAT]
             aws image refresh
             aws flavor list [--format=FORMAT]
@@ -24,7 +25,7 @@ class AwsCommand(PluginCommand):
             aws add key
             aws vm boot 
             aws vm delete
-  
+            aws drop collections
           Arguments:
             NAME     The name of the aws
             URL      URL of aws API
@@ -42,7 +43,19 @@ class AwsCommand(PluginCommand):
         stopwatch = StopWatch()
         stopwatch.start('E2E')
         aws = Aws()
+        v = Default()
+        print(v['aws','refreshImage'])
+        print(v['aws','refreshFlavor'])
+        print(v['aws','refreshVm'])
+        v.close()
 
+        if arguments.default and arguments.image  :
+            value = arguments.ON 
+            v = Default()
+            v['aws','refreshImage'] = value
+            v.close()
+            return "" 
+            
         if arguments.image and arguments.list :
             aws.images_list()
             return
@@ -72,5 +85,11 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.add and arguments.key :
-          aws.key_add()
-          return
+            aws.key_add()
+            return
+
+        if arguments.drop and arguments.collections :
+            aws.drop_collections()
+            return
+        
+          
