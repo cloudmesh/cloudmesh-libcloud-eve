@@ -7,6 +7,11 @@ from cloudmesh.common.ConfigDict import ConfigDict
 from cloudmesh.common.StopWatch import StopWatch
 from cloudmesh.common.default import Default
 
+from cloudmesh.common.StopWatch import StopWatch
+
+#Console printing packages
+from cloudmesh.common.console import Console
+
 class AwsCommand(PluginCommand):
 
     @command
@@ -43,53 +48,53 @@ class AwsCommand(PluginCommand):
         stopwatch = StopWatch()
         stopwatch.start('E2E')
         aws = Aws()
-        v = Default()
-        print(v['aws','refreshImage'])
-        print(v['aws','refreshFlavor'])
-        print(v['aws','refreshVm'])
-        v.close()
-
-        if arguments.default and arguments.image  :
-            value = arguments.ON 
-            v = Default()
-            v['aws','refreshImage'] = value
-            v.close()
-            return "" 
             
         if arguments.image and arguments.list :
             aws.images_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
             
         if arguments.image and arguments.refresh :
             aws.images_refresh()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.flavor and arguments.list :
+            
             aws.flavor_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.flavor and arguments.refresh :
             aws.flavor_refresh()
+            stopwatch.stop('E2E')
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.vm and arguments.list :
             aws.node_list()
+            stopwatch.stop('E2E')
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.vm and arguments.boot :
             aws.node_create()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
  
         if arguments.vm and arguments.delete :
             aws.node_delete()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.add and arguments.key :
             aws.key_add()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.drop and arguments.collections :
             aws.drop_collections()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
           
