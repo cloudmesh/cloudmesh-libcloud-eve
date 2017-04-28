@@ -36,10 +36,10 @@ from cloudmesh.api.pymongo_client import Pymongo_client
 # collections
 IMAGE = 'images'
 FLAVOR = 'flavors'
-
 #######################################################################
 
-
+NODE_NAME_DEFAULT = 'test1'
+KEYPAIR_NAME_DEFAULT = 'test1'
 
 class Aws(object):
     def __init__(self):
@@ -47,7 +47,7 @@ class Aws(object):
         content = readfile(filename)
         d = yaml.load(content, Loader=yaml.RoundTripLoader)
         self.configd = d["cloudmesh"]["clouds"]["aws"]
-
+        return
 
     def _get_driver(self):
 
@@ -56,7 +56,6 @@ class Aws(object):
 
         credentials = self.configd["credentials"]
         default = self.configd["default"]
-
         driver = cls(credentials["EC2_ACCESS_KEY"],
             credentials["EC2_SECRET_KEY"],
             region = default["location"])
@@ -119,10 +118,8 @@ class Aws(object):
                 db_client.post_one(IMAGE, data)
                 e[n] = data
                 n = n + 1
-                if n == 10:
-                    break
-                #Console.ok(str(Printer.dict(d, order=['id', 'name', 'driver'])))        
-
+                
+          
             Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
             #print(images)
 
@@ -150,8 +147,6 @@ class Aws(object):
         return
         
     def flavor_refresh(self):
-        print("=============SIZES/flavors============")
-
         #get driver
         driver = self._get_driver()
 
@@ -212,70 +207,64 @@ class Aws(object):
         print("The Node is ---------------",nodes)
         return nodes
 
-    def node_create(self):
+    def node_create(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
 
         # get driver
         driver = self._get_driver()
-        # Image with Netflix Asgard available in us-west-1 region
-        # https://github.com/Answers4AWS/netflixoss-ansible/wiki/AMIs-for-NetflixOSS
-        AMI_ID = 'ami-c8052d8d'
+        
+        if IMAGE_ID == '' :
+            IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
+         
         
         # Name of the existing keypair you want to use
-        KEYPAIR_NAME = 'test1'
+        if KEYPAIR_NAME == '' :
+            KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
+
         # A list of security groups you want this node to be added to
-        SECURITY_GROUP_NAMES = ['default']
+        if len(SECURITY_GROUP_NAMES) == 0 :
+            SECURITY_GROUP_NAMES = ['default']
         
-        print("getting image and size")
-        #images = driver.list_images()
+        if FLAVOR_ID == '':
+            FLAVOR_ID = self.configd["default"]['flavor']
+
         sizes = driver.list_sizes()
-        images = driver.list_images()
+        size = [s for s in sizes if s.id == FLAVOR_ID][0]
         
-        print("now selecting the image and size")
-        size = [s for s in sizes if s.id == 't2.micro'][0]
-        image = images[500]
-        
-        sz = {}
-        sz['id'] = size .id
-        sz['name'] = size.name
-        sz['ram'] = size.ram
-        sz['disk'] = size.disk
-        sz['bandwidth'] = size.bandwidth
-        sz['price'] = size.price
-        sz['driver'] = size.driver
-        sz['extra'] = {}
-
-        im = {}
-        im['id'] = str(image .id)
-        im['name'] = str(image.name)
-        im['driver'] = image.driver
-        im['extra'] = {}
-
-        print("creating the node with image :",im, " :: size:: ", sz)
+        image = driver.get_image(IMAGE_ID)
+       
         # create node
         node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
         print("The Node is Created --------------- :: ",node)
-        #print(node)
-         
+
+        if bool(node) :
+            #Push the created node in db
+            print("Stored in db")
         return
     
-    def node_delete(self):
+    def node_delete(self, NODE_NAME):
         # get driver
         #print("getting vm list")
         driver = self._get_driver()
         #List the running vm's
-        node = self.node_list()[0]
-        """
-        #node = "<Node: uuid=e257efd0e6763e9fdc04b79a00f5147fcc21ee7a, name=test1, state=RUNNING, public_ips=['54.153.96.91'], private_ips=['172.31.13.22'], provider=Amazon EC2 ...>";//self.node_list()
-        node = {}
-        node['uuid'] = "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a"
-        node['name'] = "test1"
-        node['state'] = "RUNNING"
-        node['public_ips'] = ['54.153.96.91']
-        node['private_ips'] =['172.31.13.22']
-        node['provider'] = "Amazon EC2"
-        """
-        print("Node state :: ",node.public_ips[0], "name of node ::", node.name)
-        nodes = driver.destroy_node(node)
-        print("Deleted Node is ---------------",nodes)
 
-        return
+        if NODE_NAME == '':
+            NODE_NAME = NODE_NAME_DEFAULT
+        
+        #Take the running node list
+        nodes = self.node_list()
+        node = {}
+        for n in nodes:
+            if n.name == NODE_NAME:
+                node = n
+
+        print("Node state :: ",node)
+        if bool(node) == False:
+            print("No node found to delete")
+        else:
+            isNodeDelete = driver.destroy_node(node)
+            print("Deleted Node is ---------------",isNodeDelete)
+            if isNodeDelete :
+                #Delete the node from db as well
+                print("Node deleted from db")
+        return        
+        
