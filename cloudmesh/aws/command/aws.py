@@ -27,10 +27,15 @@ class AwsCommand(PluginCommand):
             aws image list [--format=FORMAT]
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws vm list [--format=FORMAT]
-            aws add key
             aws vm boot 
             aws vm delete
+            aws vm list [--format=FORMAT]
+            aws keypair create
+            aws keypair delete
+            aws keypair list
+            aws keypair get
+            aws location list
+            aws add key
             aws drop collections
 
           Arguments:
@@ -84,14 +89,14 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.vm and arguments.list :
-            aws.node_list()
+            aws.node_list(True)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.vm and arguments.boot :
             SEL_IMAGE_ID ='ami-0183d861' #ami-d85e75b0
-            KEYPAIR_NAME = ''
+            KEYPAIR_NAME = 'test1'
             SECURITY_GROUP_NAMES = []
             FLAVOR_ID = ''
             aws.node_create(SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
@@ -99,10 +104,34 @@ class AwsCommand(PluginCommand):
             return
  
         if arguments.vm and arguments.delete :
-            NODE_NAME = ''
-            aws.node_delete(NODE_NAME)
+            NODE_UUID = '59515af83977c3e4ec0c347b23e97e832dbd1c59'
+            aws.node_delete(NODE_UUID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
+        
+        if arguments.keypair and arguments.create :
+            KEY_PAIR = "AWS3"
+            aws.keypair_create(KEY_PAIR)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.keypair and arguments.delete :
+            KEY_PAIR = "AWS1"
+            aws.keypair_delete(KEY_PAIR)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.keypair and arguments.list :
+            aws.keypair_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+        
+        if arguments.keypair and arguments.get :
+            KEY_PAIR = "AWS2"
+            aws.keypair_get(KEY_PAIR)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+            
 
         if arguments.add and arguments.key :
             aws.key_add()
@@ -114,4 +143,8 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
+        if arguments.location and arguments.list :
+            aws.location_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
           

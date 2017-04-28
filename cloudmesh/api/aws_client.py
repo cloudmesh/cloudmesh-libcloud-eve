@@ -104,7 +104,7 @@ class Aws(object):
             print("Error in fetching new list ...Showing existing images")
             self.images_list()
         else:
-            r = db_client.delete("images")
+            r = db_client.delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -197,14 +197,28 @@ class Aws(object):
         db_client.delete_database(FLAVOR)
         return
 
-    def node_list(self):
-
+    def node_list(self,SHOW_LIST):
         # get driver
-        print("getting vm list")
         driver = self._get_driver()
         #List the running vm's
         nodes = driver.list_nodes()
-        print("The Node is ---------------",nodes)
+        n = 0 ;
+        e = {}
+        for node in nodes:
+            # parse flavors
+            data = {}
+            data['uuid'] = str(node.uuid)
+            data['name'] = str(node.name)
+            data['state'] = str(node.state)
+            data['public_ips'] = str(node.public_ips)
+            data['private_ips'] = str(node.private_ips)
+            data['provider'] = str(node.driver.name)
+            e[n] = data
+            n = n + 1
+        
+        if SHOW_LIST :
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
+
         return nodes
 
     def node_create(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
@@ -241,30 +255,134 @@ class Aws(object):
             print("Stored in db")
         return
     
-    def node_delete(self, NODE_NAME):
+    def node_delete(self, NODE_UUID):
         # get driver
         #print("getting vm list")
         driver = self._get_driver()
         #List the running vm's
 
-        if NODE_NAME == '':
-            NODE_NAME = NODE_NAME_DEFAULT
         
         #Take the running node list
-        nodes = self.node_list()
+        nodes = self.node_list(False)
         node = {}
         for n in nodes:
-            if n.name == NODE_NAME:
+            if n.uuid == NODE_UUID:
                 node = n
 
-        print("Node state :: ",node)
         if bool(node) == False:
             print("No node found to delete")
         else:
             isNodeDelete = driver.destroy_node(node)
+            n = 0 ;
+            e = {}
+            data = {}
+            data['uuid'] = str(node.uuid)
+            data['name'] = str(node.name)
+            data['state'] = str(node.state)
+            data['public_ips'] = str(node.public_ips)
+            data['private_ips'] = str(node.private_ips)
+            data['provider'] = str(node.driver.name)
+            e[n] = data
+            n = n + 1
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
             print("Deleted Node is ---------------",isNodeDelete)
             if isNodeDelete :
                 #Delete the node from db as well
                 print("Node deleted from db")
         return        
+        
+    def keypair_create(self, KEY_PAIR):
+        """
+        Creates the key pair 
+        required for node object
+        """
+        driver = self._get_driver()
+        
+        name = driver.create_key_pair(KEY_PAIR)
+        print("is created !",name)
+        #Store the created keypair in db 
+        #is created ! <KeyPair name=AWS2 fingerprint=b6:5b:7e:f1:82:35:9c:b4:d1:fd:71:9e:aa:20:83:7b:b3:c4:10:7a driver=Amazon EC2>
+
+        return
+
+    def keypair_delete(self, KEY_PAIR):
+        """
+        deletes the created key pair 
+        """
+        driver = self._get_driver()
+        keyPairObj = self.keypair_get(KEY_PAIR)
+        name = driver.delete_key_pair(keyPairObj)
+        print("is deleted !",name)
+        #delete the keypair from db 
+       
+        return
+        
+    def keypair_list(self):
+        """
+        List all the available key pair
+        associated with account
+        """
+        driver = self._get_driver()
+        
+        keyPairObjs = driver.list_key_pairs()
+        n =1
+        e = {}
+        for kp in keyPairObjs:
+            data = {}
+            data['name'] = kp.name
+            data['fingerprint'] = kp.fingerprint
+            data['driver'] = kp.driver
+            e[n] = data
+            n = n + 1
+            
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
+       
+        return
+
+    def keypair_get(self, KEY_PAIR):
+        """
+        Get the keypair object 
+        associated with name
+        """
+        driver = self._get_driver()
+        
+        e = {}
+        getKeyPairObj = driver.get_key_pair(KEY_PAIR)
+        data = {}
+        data['name'] = getKeyPairObj.name
+        data['fingerprint'] = getKeyPairObj.fingerprint
+        data['driver'] = getKeyPairObj.driver
+        e[1] = data
+
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
+       
+        return getKeyPairObj
+
+    def location_list(self):
+        """
+        List all
+        available locations
+        """
+        driver = self._get_driver()
+        locations = driver.list_locations()
+        n = 1
+        e = {}
+        #<EC2NodeLocation: id=0, name=us-west-1a, country=USA, availability_zone=<ExEC2AvailabilityZone: name=us-west-1a, 
+        # zone_state=available, region_name=us-west-1> driver=Amazon EC2>,
+        for location in locations:
+            data = {}
+            data['id'] = location.id
+            data['name'] = location.name
+            data['country'] = location.country
+            data['availability_zone'] = location.availability_zone.name
+            data['zone_state'] = location.availability_zone.zone_state
+            data['region_name'] = location.availability_zone.region_name
+            data['provider'] = location.driver.name    
+            e[n] = data
+            n = n + 1
+        
+        Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
+        
+        return locations
+        
         
