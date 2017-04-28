@@ -10,19 +10,19 @@ import os
 import sys
 
 # Yaml modules
-import yaml
-#from cloudmesh.common.ConfigDict import ConfigDict # doesn't work
+from ruamel import yaml
 
 # AWS connection modules
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
 # Cloudmesh modules
-import cloudmesh
-from cloudmesh.common.console import Console
-from cloudmesh.common.Printer import Printer
 
-#Console printing packages
+# file read modules 
+from cloudmesh.common.util import path_expand
+from cloudmesh.common.util import readfile
+
+# Console printing packages
 from cloudmesh.common.console import Console
 from cloudmesh.common.Printer import Printer
 
@@ -43,16 +43,10 @@ FLAVOR = 'flavors'
 
 class Aws(object):
     def __init__(self):
-        config_path = os.getcwd() + "/config"
-        f = open(config_path + "/aws.yml")
-        self.configd = yaml.safe_load(f)
-        f.close()
-        # doesn't work
-        #self.configd = ConfigDict("aws_bak.yml",
-        #    verbose=True,load_order=[config_path])
-
-        #self.configd = ConfigDict("cloudmesh.yaml",
-        #    verbose=True,load_order=[config_path])
+        filename = path_expand("~/.cloudmesh/cloudmesh.yaml")
+        content = readfile(filename)
+        d = yaml.load(content, Loader=yaml.RoundTripLoader)
+        self.configd = d["cloudmesh"]["clouds"]["aws"]
 
 
     def _get_driver(self):
@@ -60,12 +54,12 @@ class Aws(object):
         # get driver
         cls = get_driver(Provider.EC2)
 
-        credentials = self.configd["aws"]["credentials"]
-        default = self.configd["aws"]["default"]
+        credentials = self.configd["credentials"]
+        default = self.configd["default"]
 
         driver = cls(credentials["EC2_ACCESS_KEY"],
             credentials["EC2_SECRET_KEY"],
-            region = default["region"])
+            region = default["location"])
 
         return driver
    
