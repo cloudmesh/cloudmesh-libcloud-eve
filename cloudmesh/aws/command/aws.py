@@ -20,18 +20,21 @@ class AwsCommand(PluginCommand):
         ::
 
           Usage:
+            aws refresh ON
             aws api URL
             aws default image ON
+            aws image refresh [--format=FORMAT]
             aws image list [--format=FORMAT]
-            aws image refresh
+            aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws flavor refresh
             aws vm list [--format=FORMAT]
             aws add key
             aws vm boot 
             aws vm delete
             aws drop collections
+
           Arguments:
+            ON       set configuration to on/off 
             NAME     The name of the aws
             URL      URL of aws API
             FORMAT   The format in which to print the data
@@ -45,28 +48,37 @@ class AwsCommand(PluginCommand):
             to complete the command see the man page of cm boot help
         """
 
+        v = Default()
+        if v['aws', 'refresh'] != None:
+            refresh = v['aws', 'refresh']
+        v.close()
+   
+        if arguments.refresh and arguments.ON:
+            v = Default()
+            v['aws', 'refresh'] = arguments.ON
+            v.close()
+   
+        # Initialize timer and aws client 
         stopwatch = StopWatch()
         stopwatch.start('E2E')
         aws = Aws()
-            
-        if arguments.image and arguments.list :
-            aws.images_list()
-            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
-            return
-            
-        if arguments.image and arguments.refresh :
-            aws.images_refresh()
+
+        if arguments.image: 
+            if arguments.refresh or refresh:
+                aws.images_refresh()
+            else:
+                aws.images_list()
+
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
-        if arguments.flavor and arguments.list :
-            
-            aws.flavor_list()
-            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
-            return
+        if arguments.flavor: 
+            if arguments.refresh or refresh:
+                aws.flavor_refresh()
+            else:
+                aws.flavor_list()
 
-        if arguments.flavor and arguments.refresh :
-            aws.flavor_refresh()
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
