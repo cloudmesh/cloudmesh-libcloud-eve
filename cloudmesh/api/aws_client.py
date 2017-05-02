@@ -181,23 +181,7 @@ class Aws(object):
         return
         
 
-    def key_add(self):
-        #Some test functionality
-        print("======add key=========")
-        db_client = Pymongo_client()
-        #Some test functionality
-        print("======Delete db=========")
-        db_client.delete_database(FLAVOR)
-       
-        return
-
-    def drop_collections(self):
-        db_client = Pymongo_client()
-        #Some test functionality
-        print("======Delete db=========")
-        db_client.delete_database(FLAVOR)
-        return
-
+   
     def node_list(self,SHOW_LIST):
         # get driver
         driver = self._get_driver()
@@ -249,7 +233,19 @@ class Aws(object):
        
         # create node
         node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
-        print("The Node is Created --------------- :: ",node)
+        #print("The Node is Created --------------- :: ",node)
+        n = 0 ;
+        e = {}
+        data = {}
+        data['uuid'] = str(node.uuid)
+        data['name'] = str(node.name)
+        data['state'] = str(node.state)
+        data['public_ips'] = str(node.public_ips)
+        data['private_ips'] = str(node.private_ips)
+        data['provider'] = str(node.driver.name)
+        e[n] = data
+        n = n + 1
+        Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         if bool(node) :
             #Push the created node in db
@@ -412,3 +408,19 @@ class Aws(object):
         return locations
         
         
+    def key_add(self):
+        #Some test functionality
+        print("======add key=========")
+        db_client = Pymongo_client()
+        #Some test functionality
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
+       
+        return
+
+    def drop_collections(self):
+        db_client = Pymongo_client()
+        #Some test functionality
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
+        return

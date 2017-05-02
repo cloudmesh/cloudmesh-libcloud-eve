@@ -27,8 +27,8 @@ class AwsCommand(PluginCommand):
             aws image list [--format=FORMAT]
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws vm boot 
-            aws vm delete
+            aws vm boot IMAGE_ID
+            aws vm delete UUID
             aws vm list [--format=FORMAT]
             aws keypair create NAME
             aws keypair delete NAME
@@ -39,10 +39,14 @@ class AwsCommand(PluginCommand):
             aws drop collections
 
           Arguments:
-            ON       set configuration to on/off 
-            NAME     The name of the aws
-            URL      URL of aws API
-            FORMAT   The format in which to print the data
+            ON              set configuration to on/off 
+            NAME            The name of the aws
+            URL             URL of aws API
+            FORMAT          The format in which to print the data
+            UUID            Unique User ID, which gets generate after creating the node/vm
+            IMAGE_ID        Image ID for which we are creating the vm
+            KEYPAIR_NAME    Created Key pair name
+            FLAVOR_ID       Flavor ID for which vm request to be establish
 
           Options:
             -v       verbose mode
@@ -106,17 +110,18 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
-        if arguments.vm and arguments.boot :
-            SEL_IMAGE_ID ='ami-0183d861' #ami-d85e75b0
-            KEYPAIR_NAME = 'test1'
+        if arguments.vm and arguments.boot and arguments.IMAGE_ID :
+            print(arguments.IMAGE_ID)
+            SEL_IMAGE_ID = arguments.IMAGE_ID # 'ami-0183d861' #ami-d85e75b0
+            KEYPAIR_NAME = 'AWS1'
             SECURITY_GROUP_NAMES = []
             FLAVOR_ID = ''
             aws.node_create(SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
  
-        if arguments.vm and arguments.delete :
-            NODE_UUID = '61671593de3681e7de6bd6c6e33f5a4857110864'
+        if arguments.vm and arguments.delete and arguments.UUID:
+            NODE_UUID =  arguments.UUID #'61671593de3681e7de6bd6c6e33f5a4857110864'
             aws.node_delete(NODE_UUID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
