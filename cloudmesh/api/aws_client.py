@@ -95,7 +95,7 @@ class Aws(object):
         """
         # get driver
         driver = self._get_driver()
-
+        print("img refresh")
         # get image list and print
         images = driver.list_images()
         db_client = Pymongo_client()
@@ -104,7 +104,8 @@ class Aws(object):
             print("Error in fetching new list ...Showing existing images")
             self.images_list()
         else:
-            r = db_client.delete(IMAGE)
+            print("img refresh in esles")
+            #r = db_client.delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -115,7 +116,7 @@ class Aws(object):
                 data['driver'] = str(image.driver)
                 #data['extra'] = str(image.extra)
                 # store it in mongodb
-                db_client.post_one(IMAGE, data)
+                #db_client.post_one(IMAGE, data)
                 e[n] = data
                 n = n + 1
                 
@@ -298,8 +299,20 @@ class Aws(object):
         """
         driver = self._get_driver()
         
-        name = driver.create_key_pair(KEY_PAIR)
-        print("is created !",name)
+        keypaorObj = driver.create_key_pair(KEY_PAIR)
+        #print("keypair is created !",name)
+        n = 0 ;
+        e = {}
+        # parse flavors
+        data = {}
+        data['name'] = str(keypaorObj.name)
+        data['fingerprint'] = str(keypaorObj.fingerprint)
+        data['driver'] = str(keypaorObj.driver.name)
+        e[n] = data
+        n = n + 1
+          
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
+
         #Store the created keypair in db 
         #is created ! <KeyPair name=AWS2 fingerprint=b6:5b:7e:f1:82:35:9c:b4:d1:fd:71:9e:aa:20:83:7b:b3:c4:10:7a driver=Amazon EC2>
 
@@ -310,11 +323,24 @@ class Aws(object):
         deletes the created key pair 
         """
         driver = self._get_driver()
+        #Get the keypair object
         keyPairObj = self.keypair_get(KEY_PAIR)
-        name = driver.delete_key_pair(keyPairObj)
-        print("is deleted !",name)
+        #delete the selected obj
+        kpObj = driver.delete_key_pair(keyPairObj)
+        #print("is deleted !",name)
         #delete the keypair from db 
-       
+        n = 0 ;
+        e = {}
+        # parse flavors
+        data = {}
+        data['name'] = str(kpObj.name)
+        data['fingerprint'] = str(kpObj.fingerprint)
+        data['driver'] = str(kpObj.driver.name)
+        e[n] = data
+        n = n + 1
+          
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
+        print("Is deleted !!")
         return
         
     def keypair_list(self):

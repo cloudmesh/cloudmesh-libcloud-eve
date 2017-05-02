@@ -30,10 +30,10 @@ class AwsCommand(PluginCommand):
             aws vm boot 
             aws vm delete
             aws vm list [--format=FORMAT]
-            aws keypair create
-            aws keypair delete
+            aws keypair create NAME
+            aws keypair delete NAME
             aws keypair list
-            aws keypair get
+            aws keypair get NAME
             aws location list
             aws add key
             aws drop collections
@@ -52,16 +52,28 @@ class AwsCommand(PluginCommand):
 
             to complete the command see the man page of cm boot help
         """
-
         v = Default()
         if v['aws', 'refresh'] != None:
             refresh = v['aws', 'refresh']
         v.close()
+       
    
         if arguments.refresh and arguments.ON:
             v = Default()
             v['aws', 'refresh'] = arguments.ON
             v.close()
+
+        """ v = Default()
+        if v['aws', 'keypair'] != None:
+            print("assign the name")
+            NAME = v['aws', 'keypair']
+        v.close()"""
+        
+        """if arguments.create and arguments.NAME :
+           print(" create new obj :: ",arguments.NAME )
+           v = Default()
+           v['aws', 'keypair'] = arguments.NAME
+           v.close()"""
    
         # Initialize timer and aws client 
         stopwatch = StopWatch()
@@ -104,19 +116,19 @@ class AwsCommand(PluginCommand):
             return
  
         if arguments.vm and arguments.delete :
-            NODE_UUID = '59515af83977c3e4ec0c347b23e97e832dbd1c59'
+            NODE_UUID = '61671593de3681e7de6bd6c6e33f5a4857110864'
             aws.node_delete(NODE_UUID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
-        if arguments.keypair and arguments.create :
-            KEY_PAIR = "AWS3"
+        if arguments.keypair and arguments.create and arguments.NAME:
+            KEY_PAIR = arguments.NAME #"AWS3"
             aws.keypair_create(KEY_PAIR)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
-        if arguments.keypair and arguments.delete :
-            KEY_PAIR = "AWS1"
+        if arguments.keypair and arguments.delete and arguments.NAME:
+            KEY_PAIR = arguments.NAME # "AWS1"
             aws.keypair_delete(KEY_PAIR)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
@@ -126,8 +138,8 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
-        if arguments.keypair and arguments.get :
-            KEY_PAIR = "AWS2"
+        if arguments.keypair and arguments.get and arguments.NAME :
+            KEY_PAIR =  arguments.NAME #"AWS2"
             aws.keypair_get(KEY_PAIR)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
