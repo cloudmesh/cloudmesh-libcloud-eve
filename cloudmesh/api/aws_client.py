@@ -15,7 +15,7 @@ from ruamel import yaml
 # AWS connection modules
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-
+from libcloud.compute.types import NodeState
 # Cloudmesh modules
 
 # file read modules 
@@ -205,8 +205,26 @@ class Aws(object):
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         return nodes
+    def node_create_by_profile(self, IAM_PROFILE):
+        
+        IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
+        KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
+        FLAVOR_ID = self.configd["default"]['flavor']
+        # get driver
+        driver = self._get_driver()
 
-    def node_create(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
+        sizes = driver.list_sizes()
+        size = [s for s in sizes if s.id == FLAVOR_ID][0]
+        image = driver.get_image(IMAGE_ID)
+       
+        # create node
+        node = driver.create_node(name='ANOTHER', size=size, image=image,ex_iamprofile=IAM_PROFILE)
+        
+        print(node)
+
+        return 
+    
+    def node_create_by_imageId(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
 
         # get driver
         driver = self._get_driver()
@@ -252,6 +270,41 @@ class Aws(object):
             print("Stored in db")
         return
     
+    def node_reboot(self, NODE_UUID):
+        
+        driver = self._get_driver()
+        #Take the running node list
+        nodes = self.node_list(False)
+        node = {}
+        for n in nodes:
+            if n.uuid == NODE_UUID:
+                node = n
+                break
+
+        if bool(node) == False:
+            print("No node found to reboot")
+        else:
+            if node.state == NodeState.RUNNING:
+                isNodeReboot = node.reboot()
+            n = 0 ;
+            e = {}
+            data = {}
+            data['uuid'] = str(node.uuid)
+            data['name'] = str(node.name)
+            data['state'] = str(node.state)
+            data['public_ips'] = str(node.public_ips)
+            data['private_ips'] = str(node.private_ips)
+            data['provider'] = str(node.driver.name)
+            e[n] = data
+            n = n + 1
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
+            print("Node is NodeState.REBOOTING---------------",isNodeReboot)
+            if isNodeReboot :
+                #Delete the node from db as well
+                print("Node deleted from db")
+        return        
+        return
+
     def node_delete(self, NODE_UUID):
         # get driver
         #print("getting vm list")

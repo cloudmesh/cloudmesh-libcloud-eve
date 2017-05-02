@@ -28,6 +28,7 @@ class AwsCommand(PluginCommand):
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
             aws vm boot IMAGE_ID
+            aws vm reboot NODE_UUID
             aws vm delete UUID
             aws vm list [--format=FORMAT]
             aws keypair create NAME
@@ -110,13 +111,20 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
+        if arguments.vm and arguments.reboot and arguments.NODE_UUID :
+            NODE_UUID = arguments.NODE_UUID
+            aws.node_reboot(NODE_UUID)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            
+
         if arguments.vm and arguments.boot and arguments.IMAGE_ID :
             print(arguments.IMAGE_ID)
             SEL_IMAGE_ID = arguments.IMAGE_ID # 'ami-0183d861' #ami-d85e75b0
             KEYPAIR_NAME = 'AWS1'
             SECURITY_GROUP_NAMES = []
             FLAVOR_ID = ''
-            aws.node_create(SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
+            aws.node_create_by_imageId(SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
+            #aws.node_create_by_profile(SEL_IMAGE_ID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
  
