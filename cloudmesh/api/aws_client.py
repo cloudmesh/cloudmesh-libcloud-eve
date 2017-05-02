@@ -15,7 +15,7 @@ from ruamel import yaml
 # AWS connection modules
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-
+from libcloud.compute.types import NodeState
 # Cloudmesh modules
 
 # file read modules 
@@ -95,7 +95,7 @@ class Aws(object):
         """
         # get driver
         driver = self._get_driver()
-
+        print("img refresh")
         # get image list and print
         images = driver.list_images()
         db_client = Pymongo_client()
@@ -104,7 +104,8 @@ class Aws(object):
             print("Error in fetching new list ...Showing existing images")
             self.images_list()
         else:
-            r = db_client.delete(IMAGE)
+            print("img refresh in esles")
+            #r = db_client.delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -115,7 +116,7 @@ class Aws(object):
                 data['driver'] = str(image.driver)
                 #data['extra'] = str(image.extra)
                 # store it in mongodb
-                db_client.post_one(IMAGE, data)
+                #db_client.post_one(IMAGE, data)
                 e[n] = data
                 n = n + 1
                 
@@ -180,23 +181,7 @@ class Aws(object):
         return
         
 
-    def key_add(self):
-        #Some test functionality
-        print("======add key=========")
-        db_client = Pymongo_client()
-        #Some test functionality
-        print("======Delete db=========")
-        db_client.delete_database(FLAVOR)
-       
-        return
-
-    def drop_collections(self):
-        db_client = Pymongo_client()
-        #Some test functionality
-        print("======Delete db=========")
-        db_client.delete_database(FLAVOR)
-        return
-
+   
     def node_list(self,SHOW_LIST):
         # get driver
         driver = self._get_driver()
@@ -220,8 +205,26 @@ class Aws(object):
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         return nodes
+    def node_create_by_profile(self, IAM_PROFILE):
+        
+        IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
+        KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
+        FLAVOR_ID = self.configd["default"]['flavor']
+        # get driver
+        driver = self._get_driver()
 
-    def node_create(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
+        sizes = driver.list_sizes()
+        size = [s for s in sizes if s.id == FLAVOR_ID][0]
+        image = driver.get_image(IMAGE_ID)
+       
+        # create node
+        node = driver.create_node(name='ANOTHER', size=size, image=image,ex_iamprofile=IAM_PROFILE)
+        
+        print(node)
+
+        return 
+    
+    def node_create_by_imageId(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
 
         # get driver
         driver = self._get_driver()
@@ -248,13 +251,60 @@ class Aws(object):
        
         # create node
         node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
-        print("The Node is Created --------------- :: ",node)
+        #print("The Node is Created --------------- :: ",node)
+        n = 0 ;
+        e = {}
+        data = {}
+        data['uuid'] = str(node.uuid)
+        data['name'] = str(node.name)
+        data['state'] = str(node.state)
+        data['public_ips'] = str(node.public_ips)
+        data['private_ips'] = str(node.private_ips)
+        data['provider'] = str(node.driver.name)
+        e[n] = data
+        n = n + 1
+        Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         if bool(node) :
             #Push the created node in db
             print("Stored in db")
         return
     
+    def node_reboot(self, NODE_UUID):
+        
+        driver = self._get_driver()
+        #Take the running node list
+        nodes = self.node_list(False)
+        node = {}
+        for n in nodes:
+            if n.uuid == NODE_UUID:
+                node = n
+                break
+
+        if bool(node) == False:
+            print("No node found to reboot")
+        else:
+            if node.state == NodeState.RUNNING:
+                isNodeReboot = node.reboot()
+            n = 0 ;
+            e = {}
+            data = {}
+            data['uuid'] = str(node.uuid)
+            data['name'] = str(node.name)
+            data['state'] = str(node.state)
+            data['public_ips'] = str(node.public_ips)
+            data['private_ips'] = str(node.private_ips)
+            data['provider'] = str(node.driver.name)
+            e[n] = data
+            n = n + 1
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
+            print("Node is NodeState.REBOOTING---------------",isNodeReboot)
+            if isNodeReboot :
+                #Delete the node from db as well
+                print("Node deleted from db")
+        return        
+        return
+
     def node_delete(self, NODE_UUID):
         # get driver
         #print("getting vm list")
@@ -298,8 +348,20 @@ class Aws(object):
         """
         driver = self._get_driver()
         
-        name = driver.create_key_pair(KEY_PAIR)
-        print("is created !",name)
+        keypaorObj = driver.create_key_pair(KEY_PAIR)
+        #print("keypair is created !",name)
+        n = 0 ;
+        e = {}
+        # parse flavors
+        data = {}
+        data['name'] = str(keypaorObj.name)
+        data['fingerprint'] = str(keypaorObj.fingerprint)
+        data['driver'] = str(keypaorObj.driver.name)
+        e[n] = data
+        n = n + 1
+          
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
+
         #Store the created keypair in db 
         #is created ! <KeyPair name=AWS2 fingerprint=b6:5b:7e:f1:82:35:9c:b4:d1:fd:71:9e:aa:20:83:7b:b3:c4:10:7a driver=Amazon EC2>
 
@@ -310,11 +372,24 @@ class Aws(object):
         deletes the created key pair 
         """
         driver = self._get_driver()
+        #Get the keypair object
         keyPairObj = self.keypair_get(KEY_PAIR)
-        name = driver.delete_key_pair(keyPairObj)
-        print("is deleted !",name)
+        #delete the selected obj
+        kpObj = driver.delete_key_pair(keyPairObj)
+        #print("is deleted !",name)
         #delete the keypair from db 
-       
+        n = 0 ;
+        e = {}
+        # parse flavors
+        data = {}
+        data['name'] = str(kpObj.name)
+        data['fingerprint'] = str(kpObj.fingerprint)
+        data['driver'] = str(kpObj.driver.name)
+        e[n] = data
+        n = n + 1
+          
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
+        print("Is deleted !!")
         return
         
     def keypair_list(self):
@@ -386,3 +461,19 @@ class Aws(object):
         return locations
         
         
+    def key_add(self):
+        #Some test functionality
+        print("======add key=========")
+        db_client = Pymongo_client()
+        #Some test functionality
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
+       
+        return
+
+    def drop_collections(self):
+        db_client = Pymongo_client()
+        #Some test functionality
+        print("======Delete db=========")
+        db_client.delete_database(FLAVOR)
+        return
