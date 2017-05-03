@@ -1,5 +1,5 @@
 
-image = {
+aws_image = {
     'schema': {
         'id': {
             'type': 'string'
@@ -13,7 +13,7 @@ image = {
     }
 }
 
-flavor = {
+aws_flavor = {
     'schema': {
         'id': {
             'type': 'string'
@@ -66,7 +66,7 @@ location = {
     }
 }
 
-node = {
+aws_node = {
     'schema': {
         'uuid': {
             'type': 'string'
@@ -99,13 +99,13 @@ node = {
 
 eve_settings = {
     'MONGO_HOST': 'localhost',
-    'MONGO_DBNAME': 'testing',
+    'MONGO_DBNAME': 'aws',
     'RESOURCE_METHODS': ['GET', 'POST', 'DELETE'],
     'BANDWIDTH_SAVER': False,
     'DOMAIN': {
-        'image': image,
-        'flavor': flavor,
-        'location': location,
-        'node': node,
+        'aws_image': aws_image,
+        'aws_flavor': aws_flavor,
+        'aws_location': aws_location,
+        'aws_node': aws_node,
     },
 }

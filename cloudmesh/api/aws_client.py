@@ -35,8 +35,8 @@ from cloudmesh.api.pymongo_client import Pymongo_client
 # GLOBALS
 
 # collections
-IMAGE = 'image'
-FLAVOR = 'flavor'
+IMAGE = 'aws_image'
+FLAVOR = 'aws_flavor'
 #######################################################################
 
 # TODO: get the following from yaml

@@ -38,7 +38,7 @@ ITEM_METHODS = ['GET', 'PATCH', 'DELETE']
 # Our API will expose two resources (MongoDB collections): 'people' and
 # 'works'. In order to allow for proper data validation, we define beaviour
 # and structure.
-image = {
+aws_image = {
 
     # Schema definition, based on Cerberus grammar. Check the Cerberus project
     # (https://github.com/pyeve/cerberus) for details.
@@ -56,7 +56,7 @@ image = {
     }
 }
 
-flavor = {
+aws_flavor = {
 
     'schema': {
         'id': {
@@ -85,7 +85,7 @@ flavor = {
     }
 }
 
-location = {
+aws_location = {
     'schema': {
         'id': {
             'type': 'string'
@@ -111,7 +111,7 @@ location = {
     }
 }
 
-node = {
+aws_node = {
     'schema': {
         'uuid': {
             'type': 'string'
@@ -143,8 +143,8 @@ node = {
 # The DOMAIN dict explains which resources will be available and how they will
 # be accessible to the API consumer.
 DOMAIN = {
-    'image': image,
-    'flavor': flavor,
-    'location': location,
-    'node': node,
+    'aws_image': aws_image,
+    'aws_flavor': aws_flavor,
+    'aws_location': aws_location,
+    'aws_node': aws_node,
 }

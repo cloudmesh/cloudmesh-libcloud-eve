@@ -1,11 +1,11 @@
 {
-    "image": {
+    "aws_image": {
         "id": "ami-0180d261",
         "name": "ubuntu/images-testing/ubuntu-precise-daily-i386-server-20170123",
         "driver": "string"
     },
  
-    "flavor": {
+    "aws_flavor": {
         "id": "t1.micro",
         "name": "Micro Instance",
         "ram": 627,
@@ -15,7 +15,7 @@
         "extra":{} 
     },
     
-    "location": {
+    "aws_location": {
         "id": "ami-0180d261",
         "name": "Micro Instance",
         "country": 627,
@@ -25,7 +25,7 @@
         "provider": "provider name"
     },
 
-    "node": {
+    "aws_node": {
         "uuid": "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a",
         "name": "test1",
         "state": "RUNNING",
