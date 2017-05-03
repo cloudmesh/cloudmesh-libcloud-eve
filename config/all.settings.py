@@ -8,7 +8,7 @@ image = {
             'type': 'string'
         },
         'driver': {
-            'allow_unknown': True
+            'type': 'string'
         }
     }
 }
@@ -58,11 +58,10 @@ location = {
             'type': 'string'
         },
         'region_name': {
-            'type': 'float'
+            'type': 'string'
         },
         'provider': {
-            'type': 'dict',
-            'schema': {}
+            'type': 'string'
         }
     }
 }
@@ -90,11 +89,8 @@ node = {
                 'type': 'string'
             }
         },
-        'price': {
-            'type': 'float'
-        },
-        'driver': {
-            'allow_unknown': True
+        'provider': {
+            'type': 'string'
         }
     }
 }
@@ -103,7 +99,7 @@ node = {
 
 eve_settings = {
     'MONGO_HOST': 'localhost',
-    'MONGO_DBNAME': 'aws',
+    'MONGO_DBNAME': 'testing',
     'RESOURCE_METHODS': ['GET', 'POST', 'DELETE'],
     'BANDWIDTH_SAVER': False,
     'DOMAIN': {

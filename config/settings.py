@@ -21,8 +21,8 @@ import os
 # Heroku, sensible DB connection settings are stored in environment variables.
 MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost')
 MONGO_PORT = os.environ.get('MONGO_PORT', 27017)
-MONGO_USERNAME = os.environ.get('MONGO_USERNAME', 'user')
-MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD', 'user')
+#MONGO_USERNAME = os.environ.get('MONGO_USERNAME', 'user')
+#MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD', 'user')
 MONGO_DBNAME = os.environ.get('MONGO_DBNAME', 'aws')
 
 ALLOW_UNKNOWN = True
@@ -72,16 +72,16 @@ flavor = {
         'disk': {
             'type': 'integer'
         },
-        #'bandwidth': {
-        #    'type': 'string'
-        #},
+        'bandwidth': {
+            'type': 'string'
+        },
         'price': {
             'type': 'float'
         },
-        #'extra': {
-        #    'type': 'dict',
-        #    'schema': {}
-        #},
+        'extra': {
+            'type': 'dict',
+            'schema': {}
+        },
     }
 }
 
@@ -103,11 +103,10 @@ location = {
             'type': 'string'
         },
         'region_name': {
-            'type': 'float'
+            'type': 'string'
         },
         'provider': {
-            'type': 'dict',
-            'schema': {}
+            'type': 'string',
         },
     }
 }
@@ -135,11 +134,8 @@ node = {
                 'type': 'string'
             }
         },
-        'price': {
-            'type': 'float'
-        },
-        'driver': {
-            'allow_unknown': True
+        'provider': {
+            'type': 'string'
         },
     }
 }

@@ -96,7 +96,9 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.flavor: 
-            if arguments.refresh or refresh:
+            if arguments.refresh or refresh == 'on':
+                print(arguments.refresh)
+                print(refresh)
                 aws.flavor_refresh()
             else:
                 aws.flavor_list()

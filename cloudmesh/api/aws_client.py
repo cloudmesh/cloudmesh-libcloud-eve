@@ -29,15 +29,17 @@ from cloudmesh.common.Printer import Printer
 # Database modules
 import json
 from cloudmesh.api.pymongo_client import Pymongo_client
+#from cloudmesh.api.evemongo_client import Pymongo_client
 
 #######################################################################
 # GLOBALS
 
 # collections
-IMAGE = 'images'
-FLAVOR = 'flavors'
+IMAGE = 'image'
+FLAVOR = 'flavor'
 #######################################################################
 
+# TODO: get the following from yaml
 NODE_NAME_DEFAULT = 'test1'
 KEYPAIR_NAME_DEFAULT = 'test1'
 
@@ -62,7 +64,7 @@ class Aws(object):
 
         return driver
    
-    def images_list(self):
+    def image_list(self):
         """List of amazon images 
         from mongodb
         :returns: image list objects
@@ -71,7 +73,7 @@ class Aws(object):
         """
         #Fetch the list of images from db
         db_client = Pymongo_client()
-        images = db_client.get_all(IMAGE)
+        images = db_client.perform_get(IMAGE)
         """
         if len(images) == 0:
             print("No image found")
@@ -82,11 +84,11 @@ class Aws(object):
         for d in images:
             e[n] = d
             n = n + 1
-
+            #Console.ok(str(Printer.dict(e, order=['id', 'name', 'driver'])))
         Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
         return
 
-    def images_refresh(self):
+    def image_refresh(self):
         """List of amazon images
         get store it in db
         :returns: None
@@ -102,10 +104,9 @@ class Aws(object):
        
         if len(images) == 0:
             print("Error in fetching new list ...Showing existing images")
-            self.images_list()
+            self.image_list()
         else:
-            print("img refresh in esles")
-            #r = db_client.delete(IMAGE)
+            r = db_client.perform_delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -114,15 +115,15 @@ class Aws(object):
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
                 data['driver'] = str(image.driver)
-                #data['extra'] = str(image.extra)
+                data['extra'] = str(image.extra)
                 # store it in mongodb
-                #db_client.post_one(IMAGE, data)
-                e[n] = data
-                n = n + 1
+                db_client.perform_post(IMAGE, data)
+                #e[n] = data
+                #n = n + 1
                 
           
-            Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
-            #print(images)
+            #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
+            print(images)
 
         return
 
@@ -136,28 +137,29 @@ class Aws(object):
         """
         #fetch the list from db, parse and print
         db_client = Pymongo_client()
-        data = db_client.get_all(FLAVOR)
+        data = db_client.perform_get(FLAVOR)
         n= 1
         e = {}
         for d in data:
             e[n] = d
             n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
+        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk','price'])))
        
         return
         
     def flavor_refresh(self):
         #get driver
         driver = self._get_driver()
-
+        print("got the call")
         # get flavor list and print
         sizes = driver.list_sizes()
         #print(sizes)
         n = 1   
         e = {}
         db_client = Pymongo_client()
-        db_client.delete(FLAVOR)
+        db_client.perform_delete(FLAVOR)
         for size in sizes:
             # parse flavors
             data = {}
@@ -168,20 +170,21 @@ class Aws(object):
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
             #data['driver'] = size.driver
-            data['extra'] = size.extra
+            #data['extra'] = size.extra
             e[n] = data
             n = n + 1
             # store it in mongodb
-            db_client.post_one(FLAVOR, data)
+            r = db_client.perform_post(FLAVOR, data)
+            #print ("'flavors' posted %d", r.status_code)
             #print(data)    
         
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
+        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
+        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','extra'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk','price'])))
 
         #print("successfully stored in db", r)
         return
-        
 
-   
     def node_list(self,SHOW_LIST):
         # get driver
         driver = self._get_driver()
@@ -205,6 +208,7 @@ class Aws(object):
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         return nodes
+
     def node_create_by_profile(self, IAM_PROFILE):
         
         IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
@@ -459,7 +463,6 @@ class Aws(object):
         Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
         
         return locations
-        
         
     def key_add(self):
         #Some test functionality

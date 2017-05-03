@@ -25,31 +25,20 @@ class Evemongo_client(object):
 
     def perform_post(self, resource, data):
         headers = {'Content-Type': 'application/json'}
-        print(self.endpoint(resource))
-        print(json.dumps(data, indent=4).replace('\uff0E', '.'))
-        #print(json.dumps(data))
-        #return requests.post(self.endpoint(resource), json.dumps(data, indent=4).replace('.', '\uff0E'), headers=headers)
+        print (json.dumps(data, indent = 4).replace('\uff0e', '.'))
         return requests.post(self.endpoint(resource), json.dumps(data, indent = 4).replace('\uff0e', '.'), headers=headers)
-        #return requests.post(self.endpoint(resource), json.dumps(data), headers=headers)
 
     def perform_get(self, resource):
         headers = {'Content-Type': 'application/json'}
         data_str = requests.get(self.endpoint(resource), headers=headers)
-        print(self.endpoint(resource))
-        print(data_str)
-        return json.loads(data_str.text.replace('\uff0e', '.'))['_items']
+        return json.loads(data_str.text.replace('.', '\uff0e'))['_items']
  
     def perform_delete(self, resource):
         r = requests.delete(self.endpoint(resource))
-        print ("'people' deleted %d", r.status_code)
+        print ("%s deleted: %d", resource, r.status_code)
         return 
     
     def endpoint(self, resource):
         return 'http://%s/%s/' % (
             ENTRY_POINT, resource)
 
-
-if __name__ == '__main__':
-    delete()
-    ids = post_people()
-    post_works(ids)
