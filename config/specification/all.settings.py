@@ -44,10 +44,6 @@ aws_flavor = {
         'name': {
             'type': 'string'
         },
-        'extra': {
-            'type': 'dict',
-            'schema': {}
-        },
         'price': {
             'type': 'float'
         },

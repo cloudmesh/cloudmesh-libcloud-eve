@@ -4,8 +4,7 @@
         "name": "Micro Instance",
         "ram": 627,
         "disk": 15,
-        "bandwidth": "",
-        "price": 0.025,
-        "extra":{} 
+        "bandwidth": "string",
+        "price": 0.025
     }
 }

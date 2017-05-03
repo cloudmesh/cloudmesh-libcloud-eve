@@ -51,6 +51,16 @@ eve:
 deploy: setup mongo eve
 	echo deployed
 
+gregor:
+	cd config; make
+	cms admin mongo start
+	cms admin mongo info
+
+gregor-rest:
+	cms admin rest start
+
+
+#cms admin start
 test:
 	$(call banner, "LIST SERVICE")
 	curl -s -i http://127.0.0.1:5000 
@@ -92,10 +102,12 @@ json:
 	cp sample.settings.py $(ROOT_DIR)/settings.py
 	cat $(ROOT_DIR)/settings.py
 
-install:
-	cd ../cloudmesh.common; python setup.py install; pip install .
-	cd ../cloudmesh.cmd5; python setup.py install; pip install .
-	python setup.py install; pip install .
+source:
+	rm ~/.cloudmesh/*-data
+	cd ../cloudmesh.cmd5; make source
+	cd ../cloudmesh.rest; make source
+	cd ../cloudmesh.evegenie; make clean; python setup.py install; pip install -e .
+	make clean; python setup.py install; pip install .
 
 ######################################################################
 # PYPI - ONLY TO BE USED BY GREGOR

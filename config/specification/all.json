@@ -15,10 +15,9 @@
     },
     "aws_flavor": {
         "name": "Micro Instance",
-        "extra": {},
         "price": 0.025,
         "ram": 627,
-        "bandwidth": "",
+        "bandwidth": "string",
         "disk": 15,
         "id": "t1.micro"
     },
