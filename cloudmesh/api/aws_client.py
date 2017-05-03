@@ -29,17 +29,15 @@ from cloudmesh.common.Printer import Printer
 # Database modules
 import json
 from cloudmesh.api.pymongo_client import Pymongo_client
-#from cloudmesh.api.evemongo_client import Pymongo_client
 
 #######################################################################
 # GLOBALS
 
 # collections
-IMAGE = 'aws_image'
-FLAVOR = 'aws_flavor'
+IMAGE = 'images'
+FLAVOR = 'flavors'
 #######################################################################
 
-# TODO: get the following from yaml
 NODE_NAME_DEFAULT = 'test1'
 KEYPAIR_NAME_DEFAULT = 'test1'
 
@@ -64,7 +62,7 @@ class Aws(object):
 
         return driver
    
-    def image_list(self):
+    def images_list(self):
         """List of amazon images 
         from mongodb
         :returns: image list objects
@@ -73,7 +71,7 @@ class Aws(object):
         """
         #Fetch the list of images from db
         db_client = Pymongo_client()
-        images = db_client.perform_get(IMAGE)
+        images = db_client.get_all(IMAGE)
         """
         if len(images) == 0:
             print("No image found")
@@ -84,11 +82,11 @@ class Aws(object):
         for d in images:
             e[n] = d
             n = n + 1
-            #Console.ok(str(Printer.dict(e, order=['id', 'name', 'driver'])))
+
         Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
         return
 
-    def image_refresh(self):
+    def images_refresh(self):
         """List of amazon images
         get store it in db
         :returns: None
@@ -104,9 +102,10 @@ class Aws(object):
        
         if len(images) == 0:
             print("Error in fetching new list ...Showing existing images")
-            self.image_list()
+            self.images_list()
         else:
-            r = db_client.perform_delete(IMAGE)
+            print("img refresh in esles")
+            #r = db_client.delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -115,15 +114,15 @@ class Aws(object):
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
                 data['driver'] = str(image.driver)
-                data['extra'] = str(image.extra)
+                #data['extra'] = str(image.extra)
                 # store it in mongodb
-                db_client.perform_post(IMAGE, data)
-                #e[n] = data
-                #n = n + 1
+                #db_client.post_one(IMAGE, data)
+                e[n] = data
+                n = n + 1
                 
           
-            #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
-            print(images)
+            Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
+            #print(images)
 
         return
 
@@ -137,29 +136,28 @@ class Aws(object):
         """
         #fetch the list from db, parse and print
         db_client = Pymongo_client()
-        data = db_client.perform_get(FLAVOR)
+        data = db_client.get_all(FLAVOR)
         n= 1
         e = {}
         for d in data:
             e[n] = d
             n = n + 1
 
-        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk','price'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
        
         return
         
     def flavor_refresh(self):
         #get driver
         driver = self._get_driver()
-        print("got the call")
+
         # get flavor list and print
         sizes = driver.list_sizes()
         #print(sizes)
         n = 1   
         e = {}
         db_client = Pymongo_client()
-        db_client.perform_delete(FLAVOR)
+        db_client.delete(FLAVOR)
         for size in sizes:
             # parse flavors
             data = {}
@@ -170,21 +168,20 @@ class Aws(object):
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
             #data['driver'] = size.driver
-            #data['extra'] = size.extra
+            data['extra'] = size.extra
             e[n] = data
             n = n + 1
             # store it in mongodb
-            r = db_client.perform_post(FLAVOR, data)
-            #print ("'flavors' posted %d", r.status_code)
+            db_client.post_one(FLAVOR, data)
             #print(data)    
         
-        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
-        #Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','extra'])))
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk','price'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
 
         #print("successfully stored in db", r)
         return
+        
 
+   
     def node_list(self,SHOW_LIST):
         # get driver
         driver = self._get_driver()
@@ -208,8 +205,7 @@ class Aws(object):
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
 
         return nodes
-
-    def node_create_by_profile(self, IAM_PROFILE):
+    """def node_create_by_profile(self, IAM_PROFILE):
         
         IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
         KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
@@ -226,7 +222,7 @@ class Aws(object):
         
         print(node)
 
-        return 
+        return""" 
     
     def node_create_by_imageId(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
 
@@ -430,14 +426,14 @@ class Aws(object):
         data = {}
         data['name'] = getKeyPairObj.name
         data['fingerprint'] = getKeyPairObj.fingerprint
-        data['driver'] = getKeyPairObj.driver
+        data['driver'] = getKeyPairObj.driver.name
         e[1] = data
 
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
        
         return getKeyPairObj
 
-    def location_list(self):
+    def location_list(self,printLocation):
         """
         List all
         available locations
@@ -460,19 +456,130 @@ class Aws(object):
             e[n] = data
             n = n + 1
         
-        Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
+        if printLocation == True:
+            Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
         
         return locations
         
     def key_add(self):
         #Some test functionality
         print("======add key=========")
-        db_client = Pymongo_client()
-        #Some test functionality
-        print("======Delete db=========")
-        db_client.delete_database(FLAVOR)
-       
         return
+        
+    def volume_create(self,VOLUME_SIZE,VOLUME_NAME):
+        #Some test functionality
+        #db_client = Pymongo_client()
+        #Some test functionality
+        FLAVOR_ID = self.configd["default"]['flavor']
+        LOCATION = self.configd["default"]['location']
+        driver = self._get_driver()
+        sizes = driver.list_sizes()
+        size = [s for s in sizes if s.id == FLAVOR_ID][0]
+        locations = self.location_list(False)
+        if len(locations) == 0:
+            print("Location not found!!")
+        else:
+            e = {}
+            for loc in locations:
+                if loc.availability_zone.region_name == LOCATION :
+                    locObj = loc
+                    #print(locObj)
+                    storageVolume = driver.create_volume(VOLUME_SIZE, VOLUME_NAME , location=locObj, snapshot=None)
+                    #<StorageVolume id=vol-0e80356132e246a7b size=1 driver=Amazon EC2>
+                    data = {}
+                    data['id'] = storageVolume.id
+                    data['size'] = storageVolume.size
+                    data['driver'] = storageVolume.driver.name
+                    e[0] = data
+                    Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+                else:
+                    print("Location list does not match with selected location:  ", LOCATION)
+
+                break
+       
+        #print("======Created volume ========= :: ",storageVolume)
+
+        return
+
+    def volume_list(self, printObjs):
+        driver = self._get_driver()
+        volumes = driver.list_volumes()
+        e = {}
+        n = 1
+        for vol in volumes:
+            #print(vol)
+            data = {}
+            data['id'] = vol.id
+            data['size'] = vol.size
+            data['driver'] = vol.driver.name
+            e[n] = data
+            n = n + 1
+
+        if printObjs == True :
+            Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+
+        return volumes
+
+    def volume_delete(self, VOLUME_ID):
+        driver = self._get_driver()
+        volumeObjs = self.volume_list(False)
+        e = {}
+        for vol in volumeObjs:
+            if vol.id == VOLUME_ID :
+                isDeleted = driver.destroy_volume(vol)
+                #print(vol)
+                data = {}
+                data['id'] = vol.id
+                data['size'] = vol.size
+                data['driver'] = vol.driver.name
+                e[1] = data
+                break 
+
+        Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+        print("Is deleted - ",isDeleted)
+        return
+
+    def volume_attache(self,NODE_ID,VOLUME_ID):
+        driver = self._get_driver()
+        node = ''
+        volume = ''
+        print("pass -1")
+        nodes = self.node_list(False)
+        if len(nodes) == 0:
+            #No Node available to attache volume
+            print("pass -No Node")
+            Console.warning("No Node available to attache volume")
+        else :
+            if NODE_ID == '':
+                #get the default 0th node from list
+                print("pass -2")
+                node = nodes[0]
+            else:
+                print("pass -3")
+                for nd in nodes :
+                    if nd.id == NODE_ID:
+                        #attache the default/ 0th location node 
+                        node = nd
+                        break
+        
+        volumes = self.volume_list(False)
+        if len(volumes) == 0:
+            #No Node available to attache volume
+            Console.warning("No Volumes available")
+        else :
+            for vol in volumes :
+                if vol.id == VOLUME_ID:
+                    #attache the default/ 0th location node 
+                    volume = vol
+                    break
+        print("pass -6")
+        if node and volume :
+            isVolumeAttached = driver.attach_volume(node, volume, device=None)
+            Console.ok("Is volume attached - ",isVolumeAttached)
+        else:
+            Console.info("Unable to attached volume to node,  please verify your input")
+
+        return 
 
     def drop_collections(self):
         db_client = Pymongo_client()

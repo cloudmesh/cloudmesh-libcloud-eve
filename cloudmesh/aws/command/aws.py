@@ -36,6 +36,10 @@ class AwsCommand(PluginCommand):
             aws keypair list
             aws keypair get NAME
             aws location list
+            aws volume create VOLUME_NAME
+            aws volume list
+            aws volume delete VOLUME_ID
+            aws volume attach VOLUME_ID
             aws add key
             aws drop collections
 
@@ -48,7 +52,7 @@ class AwsCommand(PluginCommand):
             IMAGE_ID        Image ID for which we are creating the vm
             KEYPAIR_NAME    Created Key pair name
             FLAVOR_ID       Flavor ID for which vm request to be establish
-
+            VOLUME_ID       Unique ID after creating a volume
           Options:
             -v       verbose mode
 
@@ -96,9 +100,7 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.flavor: 
-            if arguments.refresh or refresh == 'on':
-                print(arguments.refresh)
-                print(refresh)
+            if arguments.refresh or refresh:
                 aws.flavor_refresh()
             else:
                 aws.flavor_list()
@@ -170,8 +172,30 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
-        if arguments.location and arguments.list :
-            aws.location_list()
+        if arguments.location and arguments.list:
+            aws.location_list(True)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
           
+        if arguments.volume and arguments.create and arguments.VOLUME_NAME:
+            VOLUME_SIZE = 1 # Size of volume in gigabytes (required)
+            VOLUME_NAME =  arguments.VOLUME_NAME # Name of the volume to be created
+            aws.volume_create(VOLUME_SIZE,VOLUME_NAME)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+        
+        if arguments.volume and arguments.list:
+            aws.volume_list(True)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.volume and arguments.delete and arguments.VOLUME_ID :
+            aws.volume_delete(arguments.VOLUME_ID)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+        
+        if arguments.volume and arguments.attach and arguments.VOLUME_ID :
+            NODE_ID = '' # we are taking defaulr 0th created node from node list
+            aws.volume_attache(NODE_ID,arguments.VOLUME_ID)
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
