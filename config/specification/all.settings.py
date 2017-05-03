@@ -1,13 +1,39 @@
 
 aws_image = {
     'schema': {
+        'driver': {
+            'type': 'string'
+        },
         'id': {
             'type': 'string'
         },
         'name': {
             'type': 'string'
+        }
+    }
+}
+
+aws_location = {
+    'schema': {
+        'region_name': {
+            'type': 'string'
         },
-        'driver': {
+        'availability_zone': {
+            'type': 'integer'
+        },
+        'country': {
+            'type': 'integer'
+        },
+        'zone_state': {
+            'type': 'string'
+        },
+        'provider': {
+            'type': 'string'
+        },
+        'id': {
+            'type': 'string'
+        },
+        'name': {
             'type': 'string'
         }
     }
@@ -15,52 +41,26 @@ aws_image = {
 
 aws_flavor = {
     'schema': {
-        'id': {
-            'type': 'string'
-        },
         'name': {
             'type': 'string'
         },
-        'ram': {
-            'type': 'integer'
+        'extra': {
+            'type': 'dict',
+            'schema': {}
         },
-        'disk': {
+        'price': {
+            'type': 'float'
+        },
+        'ram': {
             'type': 'integer'
         },
         'bandwidth': {
             'type': 'string'
         },
-        'price': {
-            'type': 'float'
+        'disk': {
+            'type': 'integer'
         },
-        'extra': {
-            'type': 'dict',
-            'schema': {}
-        }
-    }
-}
-
-aws_location = {
-    'schema': {
         'id': {
-            'type': 'string'
-        },
-        'name': {
-            'type': 'string'
-        },
-        'country': {
-            'type': 'integer'
-        },
-        'availability_zone': {
-            'type': 'integer'
-        },
-        'zone_state': {
-            'type': 'string'
-        },
-        'region_name': {
-            'type': 'string'
-        },
-        'provider': {
             'type': 'string'
         }
     }
@@ -71,10 +71,10 @@ aws_node = {
         'uuid': {
             'type': 'string'
         },
-        'name': {
+        'state': {
             'type': 'string'
         },
-        'state': {
+        'name': {
             'type': 'string'
         },
         'public_ips': {
@@ -83,14 +83,14 @@ aws_node = {
                 'type': 'string'
             }
         },
+        'provider': {
+            'type': 'string'
+        },
         'private_ips': {
             'type': 'list',
             'schema': {
                 'type': 'string'
             }
-        },
-        'provider': {
-            'type': 'string'
         }
     }
 }
@@ -104,8 +104,8 @@ eve_settings = {
     'BANDWIDTH_SAVER': False,
     'DOMAIN': {
         'aws_image': aws_image,
-        'aws_flavor': aws_flavor,
         'aws_location': aws_location,
+        'aws_flavor': aws_flavor,
         'aws_node': aws_node,
     },
 }
