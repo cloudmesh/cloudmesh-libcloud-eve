@@ -29,13 +29,13 @@ from cloudmesh.common.Printer import Printer
 # Database modules
 import json
 from cloudmesh.api.pymongo_client import Pymongo_client
-
+from cloudmesh.api.evemongo_client import Evemongo_client
 #######################################################################
 # GLOBALS
 
 # collections
-IMAGE = 'images'
-FLAVOR = 'flavors'
+IMAGE = 'aws_image'
+FLAVOR = 'aws_flavor'
 #######################################################################
 
 NODE_NAME_DEFAULT = 'test1'
@@ -70,8 +70,8 @@ class Aws(object):
 
         """
         #Fetch the list of images from db
-        db_client = Pymongo_client()
-        images = db_client.get_all(IMAGE)
+        db_client = Evemongo_client()
+        images = db_client.perform_get(IMAGE)
         """
         if len(images) == 0:
             print("No image found")
@@ -98,7 +98,7 @@ class Aws(object):
         print("img refresh")
         # get image list and print
         images = driver.list_images()
-        db_client = Pymongo_client()
+        db_client = Evemongo_client()
        
         if len(images) == 0:
             print("Error in fetching new list ...Showing existing images")
@@ -106,6 +106,7 @@ class Aws(object):
         else:
             print("img refresh in esles")
             #r = db_client.delete(IMAGE)
+            db_client.perform_delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -116,7 +117,7 @@ class Aws(object):
                 data['driver'] = str(image.driver)
                 #data['extra'] = str(image.extra)
                 # store it in mongodb
-                #db_client.post_one(IMAGE, data)
+                db_client.perform_post(IMAGE, data)
                 e[n] = data
                 n = n + 1
                 
@@ -135,15 +136,15 @@ class Aws(object):
 
         """
         #fetch the list from db, parse and print
-        db_client = Pymongo_client()
-        data = db_client.get_all(FLAVOR)
+        db_client = Evemongo_client()
+        data = db_client.perform_get(FLAVOR)
         n= 1
         e = {}
         for d in data:
             e[n] = d
             n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price', 'extra'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price'])))
        
         return
         
@@ -156,8 +157,8 @@ class Aws(object):
         #print(sizes)
         n = 1   
         e = {}
-        db_client = Pymongo_client()
-        db_client.delete(FLAVOR)
+        db_client = Evemongo_client()
+        db_client.perform_delete(FLAVOR)
         for size in sizes:
             # parse flavors
             data = {}
@@ -168,14 +169,14 @@ class Aws(object):
             data['bandwidth'] = size.bandwidth
             data['price'] = size.price
             #data['driver'] = size.driver
-            data['extra'] = size.extra
+            #data['extra'] = size.extra
             e[n] = data
             n = n + 1
             # store it in mongodb
-            db_client.post_one(FLAVOR, data)
+            db_client.perform_post(FLAVOR, data)
             #print(data)    
         
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price','driver','extra'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth', 'price', 'driver'])))
 
         #print("successfully stored in db", r)
         return
@@ -202,7 +203,7 @@ class Aws(object):
             n = n + 1
         
         if SHOW_LIST :
-            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
 
         return nodes
     """def node_create_by_profile(self, IAM_PROFILE):
@@ -468,7 +469,7 @@ class Aws(object):
         
     def volume_create(self,VOLUME_SIZE,VOLUME_NAME):
         #Some test functionality
-        #db_client = Pymongo_client()
+        #db_client = Evemongo_client()
         #Some test functionality
         FLAVOR_ID = self.configd["default"]['flavor']
         LOCATION = self.configd["default"]['location']
@@ -582,7 +583,7 @@ class Aws(object):
         return 
 
     def drop_collections(self):
-        db_client = Pymongo_client()
+        db_client = Evemongo_client()
         #Some test functionality
         print("======Delete db=========")
         db_client.delete_database(FLAVOR)
