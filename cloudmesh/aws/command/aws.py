@@ -64,6 +64,8 @@ class AwsCommand(PluginCommand):
         v = Default()
         if v['aws', 'refresh'] != None:
             refresh = v['aws', 'refresh']
+        else:
+            refresh = "off"
         v.close()
        
    
@@ -90,7 +92,7 @@ class AwsCommand(PluginCommand):
         aws = Aws()
 
         if arguments.image: 
-            if arguments.refresh or refresh:
+            if arguments.refresh or refresh == "on":
                 aws.images_refresh()
             else:
                 aws.images_list()
@@ -100,7 +102,7 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.flavor: 
-            if arguments.refresh or refresh:
+            if arguments.refresh or refresh == "on":
                 aws.flavor_refresh()
             else:
                 aws.flavor_list()
