@@ -62,7 +62,7 @@ class Aws(object):
 
         return driver
    
-    def images_list(self):
+    def image_list(self):
         """List of amazon images 
         from mongodb
         :returns: image list objects
@@ -86,7 +86,7 @@ class Aws(object):
         Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
         return
 
-    def images_refresh(self):
+    def image_refresh(self):
         """List of amazon images
         get store it in db
         :returns: None
@@ -102,10 +102,12 @@ class Aws(object):
        
         if len(images) == 0:
             print("Error in fetching new list ...Showing existing images")
-            self.images_list()
+            self.image_list()
         else:
             print("img refresh in esles")
             #r = db_client.delete(IMAGE)
+            #print(images)
+            print("storing in db")
             db_client.perform_delete(IMAGE)
             n = 0 ;
             e = {}
@@ -115,7 +117,6 @@ class Aws(object):
                 data['id'] = str(image .id)
                 data['name'] = str(image.name)
                 data['driver'] = str(image.driver)
-                #data['extra'] = str(image.extra)
                 # store it in mongodb
                 db_client.perform_post(IMAGE, data)
                 e[n] = data
@@ -144,7 +145,7 @@ class Aws(object):
             e[n] = d
             n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth','price'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'price'])))
        
         return
         
@@ -166,17 +167,15 @@ class Aws(object):
             data['name'] = size.name
             data['ram'] = size.ram
             data['disk'] = size.disk
-            data['bandwidth'] = size.bandwidth
             data['price'] = size.price
-            #data['driver'] = size.driver
-            #data['extra'] = size.extra
+
             e[n] = data
             n = n + 1
             # store it in mongodb
             db_client.perform_post(FLAVOR, data)
             #print(data)    
         
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth', 'price', 'driver'])))
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth', 'price'])))
 
         #print("successfully stored in db", r)
         return

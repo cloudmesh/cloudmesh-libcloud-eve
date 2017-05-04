@@ -4,7 +4,6 @@
         "name": "Micro Instance",
         "ram": 627,
         "disk": 15,
-        "bandwidth": "string",
         "price": 0.025
     }
 }

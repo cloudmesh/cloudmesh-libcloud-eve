@@ -25,13 +25,13 @@ class Evemongo_client(object):
 
     def perform_post(self, resource, data):
         headers = {'Content-Type': 'application/json'}
-        print (json.dumps(data, indent = 4).replace('\uff0e', '.'))
         return requests.post(self.endpoint(resource), json.dumps(data, indent = 4).replace('\uff0e', '.'), headers=headers)
 
     def perform_get(self, resource):
         headers = {'Content-Type': 'application/json'}
-        data_str = requests.get(self.endpoint(resource), headers=headers)
-        return json.loads(data_str.text.replace('.', '\uff0e'))['_items']
+        out = requests.get(self.endpoint(resource), headers=headers)
+        data_str = out.text.replace('\uff0e', '.')
+        return json.loads(data_str)['_items']
  
     def perform_delete(self, resource):
         r = requests.delete(self.endpoint(resource))

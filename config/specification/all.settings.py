@@ -50,9 +50,6 @@ aws_flavor = {
         'ram': {
             'type': 'integer'
         },
-        'bandwidth': {
-            'type': 'string'
-        },
         'disk': {
             'type': 'integer'
         },

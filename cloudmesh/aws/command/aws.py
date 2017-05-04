@@ -93,9 +93,9 @@ class AwsCommand(PluginCommand):
 
         if arguments.image: 
             if arguments.refresh or refresh == "on":
-                aws.images_refresh()
+                aws.image_refresh()
             else:
-                aws.images_list()
+                aws.image_list()
 
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))

@@ -27,9 +27,6 @@ aws_flavor = {
         'disk': {
             'type': 'integer'
         },
-        'bandwidth': {
-            'type': 'string'
-        },
         'price': {
             'type': 'float'
         },
