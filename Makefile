@@ -57,8 +57,12 @@ gregor:
 	cms admin mongo info
 
 gregor-rest:
+	killall python2.7
 	cms admin rest start
 
+gregor-test:
+	curl -d '{"bandwidth": "10", "disk": 20, "id": "1", "name": "f1", "price": 1.0, "ram": 40}' -H 'Content-Type: application/json'  http://127.0.0.1:5000/aws_flavor
+	curl -s -i http://127.0.0.1:5000/aws_flavor
 
 #cms admin start
 test:
