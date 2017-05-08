@@ -76,18 +76,9 @@ class Aws(object):
         #Fetch the list of images from db
         db_client = Evemongo_client()
         images = db_client.get(IMAGE)
-        """
-        if len(images) == 0:
-            print("No image found")
-        else:"""
-        #parse and print it on console
-        n= 1
-        e = {}
-        for d in images:
-            e[n] = d
-            n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
+        Console.ok(str(Printer.dict_table(images, order=['id', 'name', 'driver'])))
+
         return
 
     def image_refresh(self):
@@ -143,14 +134,9 @@ class Aws(object):
         #fetch the list from db, parse and print
         db_client = Evemongo_client()
         data = db_client.get(FLAVOR)
-        n= 1
-        e = {}
-        for d in data:
-            e[n] = d
-            n = n + 1
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'price'])))
-       
+        Console.ok(str(Printer.dict_table(d, order=['id', 'name', 'ram', 'disk', 'price']))) 
+
         return
         
     def flavor_refresh(self):
@@ -209,24 +195,25 @@ class Aws(object):
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
 
         return nodes
-    """def node_create_by_profile(self, IAM_PROFILE):
-        
-        IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
-        KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
-        FLAVOR_ID = self.configd["default"]['flavor']
-        # get driver
-        driver = self._get_driver()
 
-        sizes = driver.list_sizes()
-        size = [s for s in sizes if s.id == FLAVOR_ID][0]
-        image = driver.get_image(IMAGE_ID)
-       
-        # create node
-        node = driver.create_node(name='ANOTHER', size=size, image=image,ex_iamprofile=IAM_PROFILE)
-        
-        print(node)
+   # def node_create_by_profile(self, IAM_PROFILE):
+   #     
+   #     IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
+   #     KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
+   #     FLAVOR_ID = self.configd["default"]['flavor']
+   #     # get driver
+   #     driver = self._get_driver()
 
-        return""" 
+   #     sizes = driver.list_sizes()
+   #     size = [s for s in sizes if s.id == FLAVOR_ID][0]
+   #     image = driver.get_image(IMAGE_ID)
+   #    
+   #     # create node
+   #     node = driver.create_node(name='ANOTHER', size=size, image=image,ex_iamprofile=IAM_PROFILE)
+   #     
+   #     print(node)
+
+   #     return""" 
     
     def node_create_by_imageId(self, image_id, keypair_name, security_group_names, flavor_id):
 
