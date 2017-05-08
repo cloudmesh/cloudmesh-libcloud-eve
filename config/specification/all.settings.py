@@ -29,25 +29,22 @@ aws_volume = {
 
 aws_location = {
     'schema': {
-        'region_name': {
+        'name': {
             'type': 'string'
         },
         'availability_zone': {
-            'type': 'integer'
+            'type': 'string'
         },
         'country': {
-            'type': 'integer'
+            'type': 'string'
         },
         'zone_state': {
             'type': 'string'
         },
-        'provider': {
-            'type': 'string'
-        },
         'id': {
-            'type': 'string'
+            'type': 'integer'
         },
-        'name': {
+        'region_name': {
             'type': 'string'
         }
     }

@@ -1,11 +1,11 @@
 {
     "aws_location": {
-        "id": "ami-0180d261",
-        "name": "Micro Instance",
-        "country": 627,
-        "availability_zone": 15,
-        "zone_state": "zone state",
-        "region_name": "region name",
-        "provider": "provider name"
+        "region_name": "us-west-1",
+        "availability_zone": "us-west-1a",
+        "country": "USA",
+        "zone_state": "available",
+        "id": 1,
+        "name": "us-west-1a"
     }
-}    
+}
+

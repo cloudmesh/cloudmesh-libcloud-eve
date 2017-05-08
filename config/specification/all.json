@@ -10,13 +10,12 @@
         "size": 1
     },
     "aws_location": {
-        "region_name": "region name",
-        "availability_zone": 15,
-        "country": 627,
-        "zone_state": "zone state",
-        "provider": "provider name",
-        "id": "ami-0180d261",
-        "name": "Micro Instance"
+        "name": "us-west-1a",
+        "availability_zone": "us-west-1a",
+        "country": "USA",
+        "zone_state": "available",
+        "id": 1,
+        "region_name": "us-west-1"
     },
     "aws_flavor": {
         "disk": 15,

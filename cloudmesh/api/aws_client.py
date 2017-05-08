@@ -214,8 +214,6 @@ class Aws(object):
             data['uuid'] = str(node.uuid)
             data['name'] = str(node.name)
             data['state'] = str(node.state)
-            #data['public_ips'] = str(node.public_ips)
-            #data['private_ips'] = str(node.private_ips)
             data['provider'] = str(node.driver.name)
             e[n] = data
             n = n + 1
@@ -223,7 +221,7 @@ class Aws(object):
             db_client.post(NODE, data)
 
         if show_list:
-            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
+            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'provider'])))
 
         return nodes
 
@@ -295,7 +293,7 @@ class Aws(object):
         
         driver = self._get_driver()
         #Take the running node list
-        nodes = self.node_list(False)
+        nodes = self.node_refresh(False)
         node = {}
         for n in nodes:
             if n.uuid == node_uuid:
@@ -333,7 +331,7 @@ class Aws(object):
 
         
         #Take the running node list
-        nodes = self.node_list(False)
+        nodes = self.node_refresh(False)
         node = {}
         for n in nodes:
             if n.uuid == node_uuid:
@@ -467,13 +465,15 @@ class Aws(object):
        
         return key_pair_obj
 
-    def location_list(self, print_location):
+    def location_refresh(self, print_location):
         """
         List all
         available locations
         """
         driver = self._get_driver()
         locations = driver.list_locations()
+        db_client = Evemongo_client()
+        db_client.delete(LOCATION)
         n = 1
         e = {}
         #<EC2NodeLocation: id=0, name=us-west-1a, country=USA, availability_zone=<ExEC2AvailabilityZone: name=us-west-1a, 
@@ -486,24 +486,31 @@ class Aws(object):
             data['availability_zone'] = location.availability_zone.name
             data['zone_state'] = location.availability_zone.zone_state
             data['region_name'] = location.availability_zone.region_name
-            data['provider'] = location.driver.name    
+            #data['provider'] = location.driver.name    
             e[n] = data
             n = n + 1
+            db_client.post(LOCATION, data)
         
         if print_location == True:
             Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
         
         return locations
         
-    def key_add(self):
-        #Some test functionality
-        print("======add key=========")
-        return
-        
+    def location_list(self):
+        db_client = Evemongo_client()
+        locations = db_client.get(LOCATION)
+        n = 1
+        e = {}
+        for location in locations:
+            e[n] = location
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
+
+    
     def volume_create(self, volume_size, volume_name):
         #Some test functionality
-        #db_client = Evemongo_client()
-        db_client = Pymongo_client()
+        db_client = Evemongo_client()
         #Some test functionality
         flavor_id = self.configd["default"]['flavor']
         location = self.configd["default"]['location']
@@ -538,10 +545,10 @@ class Aws(object):
 
         return
 
-    def volume_list(self, printObjs):
+    def volume_list(self, print_objs):
             
         #Fetch the list of images from db
-        db_client = Pymongo_client()
+        db_client = Evemongo_client()
         volumes = db_client.get(VOLUME)
         
         e = {}
@@ -550,14 +557,16 @@ class Aws(object):
             e[n] = vol
             n = n + 1
 
-        if printObjs == True :
+        if print_objs == True :
             Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
 
         return volumes
 
-    def volume_list_refresh(self, print_objs):
+    def volume_refresh(self, print_objs):
         driver = self._get_driver()
         volumes = driver.list_volumes()
+        db_client = Evemongo_client()
+        db_client.delete(VOLUME)
         e = {}
         n = 1
         for vol in volumes:
@@ -568,6 +577,7 @@ class Aws(object):
             data['driver'] = vol.driver.name
             e[n] = data
             n = n + 1
+            db_client.post(VOLUME, data)
 
         if print_objs == True :
             Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
@@ -576,7 +586,7 @@ class Aws(object):
 
     def volume_delete(self, volume_id):
         driver = self._get_driver()
-        volume_objs = self.volume_list(False)
+        volume_objs = self.volume_refresh(False)
         e = {}
         for vol in volume_objs:
             if vol.id == volume_id :
@@ -597,7 +607,7 @@ class Aws(object):
         driver = self._get_driver()
         node = ''
         volume = ''
-        nodes = self.node_list(False)
+        nodes = self.node_refresh(False)
         if len(nodes) == 0:
             #No Node available to attache volume
             print("pass -No Node")
@@ -613,7 +623,7 @@ class Aws(object):
                         node = nd
                         break
         
-        volumes = self.volume_list(False)
+        volumes = self.volume_refresh(False)
         if len(volumes) == 0:
             #No Node available to attache volume
             Console.warning("No Volumes available")

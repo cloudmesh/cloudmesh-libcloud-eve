@@ -38,11 +38,12 @@ class AwsCommand(PluginCommand):
             aws keypair refresh
             aws keypair get NAME
             aws location list
+            aws location refresh
             aws volume create VOLUME_NAME
             aws volume list
+            aws volume refresh
             aws volume delete VOLUME_ID
             aws volume attach VOLUME_ID
-            aws add key
             aws drop collections
 
           Arguments:
@@ -176,19 +177,18 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
             
-
-        if arguments.add and arguments.key :
-            aws.key_add()
-            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
-            return
-
         if arguments.drop and arguments.collections :
             aws.drop_collections()
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.location and arguments.list:
-            aws.location_list(True)
+            aws.location_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.location and arguments.refresh:
+            aws.location_refresh(True)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
           
@@ -201,7 +201,7 @@ class AwsCommand(PluginCommand):
         
         if arguments.volume and arguments.list:
             if arguments.refresh or refresh == "on":
-                volume_list_refresh(True)
+                volume_refresh(True)
             else:
                 aws.volume_list(True)
             
