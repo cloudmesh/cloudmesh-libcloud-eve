@@ -14,11 +14,11 @@
         "name": "Micro Instance"
     },
     "aws_flavor": {
-        "name": "Micro Instance",
+        "disk": 15,
         "price": 0.025,
         "ram": 627,
-        "disk": 15,
-        "id": "t1.micro"
+        "id": "t1.micro",
+        "name": "Micro Instance"
     },
     "aws_node": {
         "uuid": "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a",

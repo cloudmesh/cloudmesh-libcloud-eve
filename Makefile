@@ -113,6 +113,11 @@ source:
 	cd ../cloudmesh.evegenie; make clean; python setup.py install; pip install -e .
 	make clean; python setup.py install; pip install .
 
+rest:
+	cd config; make
+	cms admin mongo start
+	cms admin rest start
+
 ######################################################################
 # PYPI - ONLY TO BE USED BY GREGOR
 ######################################################################

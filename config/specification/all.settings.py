@@ -41,8 +41,8 @@ aws_location = {
 
 aws_flavor = {
     'schema': {
-        'name': {
-            'type': 'string'
+        'disk': {
+            'type': 'integer'
         },
         'price': {
             'type': 'float'
@@ -50,10 +50,10 @@ aws_flavor = {
         'ram': {
             'type': 'integer'
         },
-        'disk': {
-            'type': 'integer'
-        },
         'id': {
+            'type': 'string'
+        },
+        'name': {
             'type': 'string'
         }
     }
