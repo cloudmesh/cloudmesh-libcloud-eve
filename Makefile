@@ -107,7 +107,7 @@ json:
 	cat $(ROOT_DIR)/settings.py
 
 source:
-	rm ~/.cloudmesh/*-data
+	rm -f ~/.cloudmesh/*-data
 	cd ../cloudmesh.cmd5; make source
 	cd ../cloudmesh.rest; make source
 	cd ../cloudmesh.evegenie; make clean; python setup.py install; pip install -e .
