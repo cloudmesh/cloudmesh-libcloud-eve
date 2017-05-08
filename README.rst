@@ -35,15 +35,16 @@ Now you need to get two source directories apart from . We assume you place them
 
     mkdir ~/github
     cd ~/github
-    git clone https://github.com/cloudmesh/cloudmesh.common.git
     git clone https://github.com/cloudmesh/cloudmesh.cmd5.git
+    git clone https://github.com/cloudmesh/cloudmesh.rest.git
+    git clone https://github.com/cloudmesh/cloudmesh.evegenie.git
     git clone https://github.com/cloudmesh/cloudmesh.aws.git
 
 
 To install them simply to the following::
 
     cd ~/github/cloudmesh.aws
-    make install
+    make source
 
 Configuration
 ------------------
@@ -61,9 +62,15 @@ You will have to do the following modifications to match you machine::
       size: 'SIZE ID'
       region: 'REGION'
 
-The mongodb configuration can be specified by updating yml file::
+The mongodb configuration and collection schema are stored in config/specification/all.settings.py.
+The rest srvices can be started using that by following command::
 
-    mongodb:
-      host: 'localhost'
-      port: '27017'
-      database: 'aws'
+    make rest
+
+
+The AWS client setup is now ready to be used. Whether to fetch the information from the cloud over 
+the network, or from the database stored locally, can be set by setting 'refresh' switch.::
+
+    cms aws refresh on
+
+
