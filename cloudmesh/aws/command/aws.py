@@ -187,7 +187,11 @@ class AwsCommand(PluginCommand):
             return
         
         if arguments.volume and arguments.list:
-            aws.volume_list(True)
+            if arguments.refresh or refresh == "on":
+                volume_list_refresh(True)
+            else:
+                aws.volume_list(True)
+            
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 

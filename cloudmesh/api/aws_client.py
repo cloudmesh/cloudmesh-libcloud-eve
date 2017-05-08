@@ -36,6 +36,10 @@ from cloudmesh.api.evemongo_client import Evemongo_client
 # collections
 IMAGE = 'aws_image'
 FLAVOR = 'aws_flavor'
+LOCATIONS = 'aws_location'
+NODES = 'aws_node'
+VOLUMES = 'aws_volume'
+KEYPAIRS = 'aws_keypair'
 #######################################################################
 
 NODE_NAME_DEFAULT = 'test1'
@@ -469,6 +473,7 @@ class Aws(object):
     def volume_create(self,VOLUME_SIZE,VOLUME_NAME):
         #Some test functionality
         #db_client = Evemongo_client()
+        db_client = Pymongo_client()
         #Some test functionality
         FLAVOR_ID = self.configd["default"]['flavor']
         LOCATION = self.configd["default"]['location']
@@ -491,6 +496,8 @@ class Aws(object):
                     data['size'] = storageVolume.size
                     data['driver'] = storageVolume.driver.name
                     e[0] = data
+                    # store it in mongodb
+                    db_client.perform_post(VOLUMES, data)
                     Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
                 else:
                     print("Location list does not match with selected location:  ", LOCATION)
@@ -502,6 +509,23 @@ class Aws(object):
         return
 
     def volume_list(self, printObjs):
+            
+        #Fetch the list of images from db
+        db_client = Pymongo_client()
+        volumes = db_client.perform_get(VOLUMES)
+        
+        e = {}
+        n = 1
+        for vol in volumes:
+            e[n] = vol
+            n = n + 1
+
+        if printObjs == True :
+            Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+
+        return volumes
+
+    def volume_list_refresh(self, printObjs):
         driver = self._get_driver()
         volumes = driver.list_volumes()
         e = {}
