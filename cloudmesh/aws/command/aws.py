@@ -31,6 +31,7 @@ class AwsCommand(PluginCommand):
             aws vm reboot NODE_UUID
             aws vm delete UUID
             aws vm list [--format=FORMAT]
+            aws vm refresh [--format=FORMAT]
             aws keypair create NAME
             aws keypair delete NAME
             aws keypair list
@@ -113,6 +114,12 @@ class AwsCommand(PluginCommand):
 
         if arguments.vm and arguments.list :
             aws.node_list(True)
+            stopwatch.stop('E2E')
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.vm and arguments.refresh :
+            aws.node_refresh(True)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return

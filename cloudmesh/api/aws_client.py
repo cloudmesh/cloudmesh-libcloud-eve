@@ -77,7 +77,13 @@ class Aws(object):
         db_client = Evemongo_client()
         images = db_client.get(IMAGE)
 
-        Console.ok(str(Printer.dict_table(images, order=['id', 'name', 'driver'])))
+        n= 1
+        e = {}
+        for image in images:
+            e[n] = image
+            n = n + 1
+  
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
 
         return
 
@@ -99,7 +105,6 @@ class Aws(object):
             print("Error in fetching new list ...Showing existing images")
             self.image_list()
         else:
-            print("img refresh in esles")
             #r = db_client.delete(IMAGE)
             #print(images)
             print("storing in db")
@@ -133,9 +138,15 @@ class Aws(object):
         """
         #fetch the list from db, parse and print
         db_client = Evemongo_client()
-        data = db_client.get(FLAVOR)
+        sizes = db_client.get(FLAVOR)
 
-        Console.ok(str(Printer.dict_table(d, order=['id', 'name', 'ram', 'disk', 'price']))) 
+        n= 1
+        e = {}
+        for size in sizes:
+            e[n] = size
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'price'])))        
 
         return
         
@@ -171,12 +182,24 @@ class Aws(object):
         return
         
 
+
+    def node_list(self):
+        db_client = Evemongo_client()
+        data = db_client.get(FLAVOR)
+
+        Console.ok(str(Printer.dict_table(data, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
+
+        return
    
-    def node_list(self,SHOW_LIST):
+    def node_refresh(self, show_list):
         # get driver
         driver = self._get_driver()
         #List the running vm's
         nodes = driver.list_nodes()
+
+        db_client = Evemongo_client()
+        db_client.delete(NODE)
+
         n = 0 ;
         e = {}
         for node in nodes:
@@ -190,8 +213,10 @@ class Aws(object):
             data['provider'] = str(node.driver.name)
             e[n] = data
             n = n + 1
-        
-        if SHOW_LIST :
+            
+            db_client.post(NODE, data)
+
+        if show_list:
             Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
 
         return nodes
@@ -294,7 +319,6 @@ class Aws(object):
                 #Delete the node from db as well
                 print("Node deleted from db")
         return        
-        return
 
     def node_delete(self, node_uuid):
         # get driver

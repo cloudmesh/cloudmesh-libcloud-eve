@@ -1,10 +1,14 @@
 {
     "aws_node": {
         "uuid": "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a",
-        "name": "test1",
         "state": "RUNNING",
-        "public_ips": ["54.153.96.91"],
-        "private_ips": ["172.31.13.22"],
-        "provider": "provider"
-       }
+        "name": "test1",
+        "public_ips": [
+            "54.153.96.91"
+        ],
+        "provider": "provider",
+        "private_ips": [
+            "172.31.13.22"
+        ]
+    }
 }
