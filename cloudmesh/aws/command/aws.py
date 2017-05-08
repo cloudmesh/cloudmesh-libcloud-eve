@@ -35,6 +35,7 @@ class AwsCommand(PluginCommand):
             aws keypair create NAME
             aws keypair delete NAME
             aws keypair list
+            aws keypair refresh
             aws keypair get NAME
             aws location list
             aws volume create VOLUME_NAME
@@ -161,6 +162,11 @@ class AwsCommand(PluginCommand):
 
         if arguments.keypair and arguments.list :
             aws.keypair_list()
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+
+        if arguments.keypair and arguments.refresh :
+            aws.keypair_refresh()
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         

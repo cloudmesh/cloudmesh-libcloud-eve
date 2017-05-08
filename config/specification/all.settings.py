@@ -73,6 +73,17 @@ aws_flavor = {
     }
 }
 
+aws_keypair = {
+    'schema': {
+        'name': {
+            'type': 'string'
+        },
+        'fingerprint': {
+            'type': 'string'
+        }
+    }
+}
+
 aws_node = {
     'schema': {
         'state': {
@@ -102,6 +113,7 @@ eve_settings = {
         'aws_volume': aws_volume,
         'aws_location': aws_location,
         'aws_flavor': aws_flavor,
+        'aws_keypair': aws_keypair,
         'aws_node': aws_node,
     },
 }

@@ -368,23 +368,23 @@ class Aws(object):
         """
         driver = self._get_driver()
         
-        keypaorObj = driver.create_key_pair(key_pair)
+        key_pair_obj = driver.create_key_pair(key_pair)
         #print("keypair is created !",name)
         n = 0 ;
         e = {}
         # parse flavors
         data = {}
-        data['name'] = str(keypaorObj.name)
-        data['fingerprint'] = str(keypaorObj.fingerprint)
-        data['driver'] = str(keypaorObj.driver.name)
+        data['name'] = str(key_pair_obj.name)
+        data['fingerprint'] = str(key_pair_obj.fingerprint)
         e[n] = data
         n = n + 1
           
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
 
         #Store the created keypair in db 
-        #is created ! <KeyPair name=AWS2 fingerprint=b6:5b:7e:f1:82:35:9c:b4:d1:fd:71:9e:aa:20:83:7b:b3:c4:10:7a driver=Amazon EC2>
-
+        db_client = Evemongo_client()
+        db_client.post(KEYPAIR, data)
+        
         return
 
     def keypair_delete(self, key_pair):
@@ -393,32 +393,34 @@ class Aws(object):
         """
         driver = self._get_driver()
         #Get the keypair object
-        keyPairObj = self.keypair_get(key_pair)
+        key_pair_obj = self.keypair_get(key_pair)
         #delete the selected obj
-        kpObj = driver.delete_key_pair(keyPairObj)
+        kp_obj = driver.delete_key_pair(key_pair_obj)
         #print("is deleted !",name)
         #delete the keypair from db 
         n = 0 ;
         e = {}
         # parse flavors
         data = {}
-        data['name'] = str(kpObj.name)
-        data['fingerprint'] = str(kpObj.fingerprint)
-        data['driver'] = str(kpObj.driver.name)
+        data['name'] = str(kp_obj.name)
+        data['fingerprint'] = str(kp_obj.fingerprint)
         e[n] = data
         n = n + 1
           
-        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint', 'driver'])))
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
         print("Is deleted !!")
         return
         
-    def keypair_list(self):
+    def keypair_refresh(self):
         """
         List all the available key pair
         associated with account
         """
         driver = self._get_driver()
         
+        db_client = Evemongo_client()
+        db_client.delete(KEYPAIR)
+
         key_pair_objs = driver.list_key_pairs()
         n =1
         e = {}
@@ -426,13 +428,26 @@ class Aws(object):
             data = {}
             data['name'] = kp.name
             data['fingerprint'] = kp.fingerprint
-            data['driver'] = kp.driver
             e[n] = data
             n = n + 1
+
+            db_client.post(KEYPAIR, data)        
             
-        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
        
         return
+
+    def keypair_list(self):
+        db_client = Evemongo_client()
+        keys = db_client.get(KEYPAIR)
+        n= 1
+        e = {}
+        for key in keys:
+            e[n] = key
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
+    
 
     def keypair_get(self, key_pair):
         """
@@ -446,10 +461,9 @@ class Aws(object):
         data = {}
         data['name'] = key_pair_obj.name
         data['fingerprint'] = key_pair_obj.fingerprint
-        data['driver'] = key_pair_obj.driver.name
         e[1] = data
 
-        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
+        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
        
         return key_pair_obj
 
