@@ -20,25 +20,37 @@ ENTRY_POINT = 'localhost:5000'
 class Evemongo_client(object):
     
     @classmethod
-    def post(self, resource, data):
+    def post(cls, resource, data):
         headers = {'Content-Type': 'application/json'}
-        return requests.post(self.endpoint(resource), json.dumps(data, indent = 4).replace('\uff0e', '.'), headers=headers)
+        return requests.post(cls.endpoint(resource), json.dumps(data, indent = 4).replace('\uff0e', '.'), headers=headers)
 
     @classmethod
-    def get(self, resource):
+    def get(cls, resource):
         headers = {'Content-Type': 'application/json'}
-        out = requests.get(self.endpoint(resource), headers=headers)
+        out = requests.get(cls.endpoint(resource), headers=headers)
         data_str = out.text.replace('\uff0e', '.')
         return json.loads(data_str)['_items']
  
     @classmethod
-    def delete(self, resource):
-        r = requests.delete(self.endpoint(resource))
+    def delete(cls, resource, filter = None):
+        if filter:
+            url = cls.endpoint(resource) + "?where=" + json.dumps(filter).replace('\uff0e', '.')
+            headers = {'Content-Type': 'application/json'}
+            data = requests.get(url, headers = headers)
+            if len(json.loads(out.text)['_items']) > 0:
+                for item in json.loads(data.text)['_items']:
+                    headers['If-Match'] = item['_etag']
+                    url = cls.endpoint(resource)+item['_id']
+                    r = requests.delete(url, headers = headers)
+
+        else:
+            r = requests.delete(cls.endpoint(resource))
+
         print ("%s deleted: %d", resource, r.status_code)
         return 
     
     @classmethod
-    def endpoint(self, resource):
+    def endpoint(cls, resource):
         return 'http://%s/%s/' % (
             ENTRY_POINT, resource)
 
