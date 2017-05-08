@@ -36,10 +36,10 @@ from cloudmesh.api.evemongo_client import Evemongo_client
 # collections
 IMAGE = 'aws_image'
 FLAVOR = 'aws_flavor'
-LOCATIONS = 'aws_location'
-NODES = 'aws_node'
-VOLUMES = 'aws_volume'
-KEYPAIRS = 'aws_keypair'
+LOCATION = 'aws_location'
+NODE = 'aws_node'
+VOLUME = 'aws_volume'
+KEYPAIR = 'aws_keypair'
 #######################################################################
 
 NODE_NAME_DEFAULT = 'test1'
@@ -75,7 +75,7 @@ class Aws(object):
         """
         #Fetch the list of images from db
         db_client = Evemongo_client()
-        images = db_client.perform_get(IMAGE)
+        images = db_client.get(IMAGE)
         """
         if len(images) == 0:
             print("No image found")
@@ -122,7 +122,7 @@ class Aws(object):
                 data['name'] = str(image.name)
                 data['driver'] = str(image.driver)
                 # store it in mongodb
-                db_client.perform_post(IMAGE, data)
+                db_client.post(IMAGE, data)
                 e[n] = data
                 n = n + 1
                 
@@ -142,7 +142,7 @@ class Aws(object):
         """
         #fetch the list from db, parse and print
         db_client = Evemongo_client()
-        data = db_client.perform_get(FLAVOR)
+        data = db_client.get(FLAVOR)
         n= 1
         e = {}
         for d in data:
@@ -163,7 +163,7 @@ class Aws(object):
         n = 1   
         e = {}
         db_client = Evemongo_client()
-        db_client.perform_delete(FLAVOR)
+        db_client.delete(FLAVOR)
         for size in sizes:
             # parse flavors
             data = {}
@@ -176,7 +176,7 @@ class Aws(object):
             e[n] = data
             n = n + 1
             # store it in mongodb
-            db_client.perform_post(FLAVOR, data)
+            db_client.post(FLAVOR, data)
             #print(data)    
         
         Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'ram', 'disk', 'bandwidth', 'price'])))
@@ -228,33 +228,33 @@ class Aws(object):
 
         return""" 
     
-    def node_create_by_imageId(self, IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID):
+    def node_create_by_imageId(self, image_id, keypair_name, security_group_names, flavor_id):
 
         # get driver
         driver = self._get_driver()
         
-        if IMAGE_ID == '' :
-            IMAGE_ID =  self.configd["default"]['image']#'ami-0183d861'
+        if image_id == '' :
+            image_id =  self.configd["default"]['image']#'ami-0183d861'
          
         
         # Name of the existing keypair you want to use
-        if KEYPAIR_NAME == '' :
-            KEYPAIR_NAME = KEYPAIR_NAME_DEFAULT
+        if keypair_name == '' :
+            keypair_name = KEYPAIR_NAME_DEFAULT
 
         # A list of security groups you want this node to be added to
-        if len(SECURITY_GROUP_NAMES) == 0 :
-            SECURITY_GROUP_NAMES = ['default']
+        if len(security_group_names) == 0 :
+            security_group_names = ['default']
         
-        if FLAVOR_ID == '':
-            FLAVOR_ID = self.configd["default"]['flavor']
+        if flavor_id == '':
+            flavor_id = self.configd["default"]['flavor']
 
         sizes = driver.list_sizes()
-        size = [s for s in sizes if s.id == FLAVOR_ID][0]
+        size = [s for s in sizes if s.id == flavor_id][0]
         
-        image = driver.get_image(IMAGE_ID)
+        image = driver.get_image(image_id)
        
         # create node
-        node = driver.create_node(name='test1', size=size, image=image, ex_keyname=KEYPAIR_NAME,ex_securitygroup=SECURITY_GROUP_NAMES)
+        node = driver.create_node(name='test1', size = size, image = image, ex_keyname = keypair_name, ex_securitygroup = security_group_names)
         #print("The Node is Created --------------- :: ",node)
         n = 0 ;
         e = {}
@@ -274,14 +274,14 @@ class Aws(object):
             print("Stored in db")
         return
     
-    def node_reboot(self, NODE_UUID):
+    def node_reboot(self, node_uuid):
         
         driver = self._get_driver()
         #Take the running node list
         nodes = self.node_list(False)
         node = {}
         for n in nodes:
-            if n.uuid == NODE_UUID:
+            if n.uuid == node_uuid:
                 node = n
                 break
 
@@ -309,7 +309,7 @@ class Aws(object):
         return        
         return
 
-    def node_delete(self, NODE_UUID):
+    def node_delete(self, node_uuid):
         # get driver
         #print("getting vm list")
         driver = self._get_driver()
@@ -320,7 +320,7 @@ class Aws(object):
         nodes = self.node_list(False)
         node = {}
         for n in nodes:
-            if n.uuid == NODE_UUID:
+            if n.uuid == node_uuid:
                 node = n
 
         if bool(node) == False:
@@ -345,14 +345,14 @@ class Aws(object):
                 print("Node deleted from db")
         return        
         
-    def keypair_create(self, KEY_PAIR):
+    def keypair_create(self, key_pair):
         """
         Creates the key pair 
         required for node object
         """
         driver = self._get_driver()
         
-        keypaorObj = driver.create_key_pair(KEY_PAIR)
+        keypaorObj = driver.create_key_pair(key_pair)
         #print("keypair is created !",name)
         n = 0 ;
         e = {}
@@ -371,13 +371,13 @@ class Aws(object):
 
         return
 
-    def keypair_delete(self, KEY_PAIR):
+    def keypair_delete(self, key_pair):
         """
         deletes the created key pair 
         """
         driver = self._get_driver()
         #Get the keypair object
-        keyPairObj = self.keypair_get(KEY_PAIR)
+        keyPairObj = self.keypair_get(key_pair)
         #delete the selected obj
         kpObj = driver.delete_key_pair(keyPairObj)
         #print("is deleted !",name)
@@ -403,10 +403,10 @@ class Aws(object):
         """
         driver = self._get_driver()
         
-        keyPairObjs = driver.list_key_pairs()
+        key_pair_objs = driver.list_key_pairs()
         n =1
         e = {}
-        for kp in keyPairObjs:
+        for kp in key_pair_objs:
             data = {}
             data['name'] = kp.name
             data['fingerprint'] = kp.fingerprint
@@ -418,7 +418,7 @@ class Aws(object):
        
         return
 
-    def keypair_get(self, KEY_PAIR):
+    def keypair_get(self, key_pair):
         """
         Get the keypair object 
         associated with name
@@ -426,18 +426,18 @@ class Aws(object):
         driver = self._get_driver()
         
         e = {}
-        getKeyPairObj = driver.get_key_pair(KEY_PAIR)
+        key_pair_obj = driver.get_key_pair(key_pair)
         data = {}
-        data['name'] = getKeyPairObj.name
-        data['fingerprint'] = getKeyPairObj.fingerprint
-        data['driver'] = getKeyPairObj.driver.name
+        data['name'] = key_pair_obj.name
+        data['fingerprint'] = key_pair_obj.fingerprint
+        data['driver'] = key_pair_obj.driver.name
         e[1] = data
 
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint','driver'])))
        
-        return getKeyPairObj
+        return key_pair_obj
 
-    def location_list(self,printLocation):
+    def location_list(self, print_location):
         """
         List all
         available locations
@@ -460,7 +460,7 @@ class Aws(object):
             e[n] = data
             n = n + 1
         
-        if printLocation == True:
+        if print_location == True:
             Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
         
         return locations
@@ -470,26 +470,26 @@ class Aws(object):
         print("======add key=========")
         return
         
-    def volume_create(self,VOLUME_SIZE,VOLUME_NAME):
+    def volume_create(self, volume_size, volume_name):
         #Some test functionality
         #db_client = Evemongo_client()
         db_client = Pymongo_client()
         #Some test functionality
-        FLAVOR_ID = self.configd["default"]['flavor']
-        LOCATION = self.configd["default"]['location']
+        flavor_id = self.configd["default"]['flavor']
+        location = self.configd["default"]['location']
         driver = self._get_driver()
         sizes = driver.list_sizes()
-        size = [s for s in sizes if s.id == FLAVOR_ID][0]
+        size = [s for s in sizes if s.id == flavor_id][0]
         locations = self.location_list(False)
         if len(locations) == 0:
             print("Location not found!!")
         else:
             e = {}
             for loc in locations:
-                if loc.availability_zone.region_name == LOCATION :
+                if loc.availability_zone.region_name == location:
                     locObj = loc
                     #print(locObj)
-                    storageVolume = driver.create_volume(VOLUME_SIZE, VOLUME_NAME , location=locObj, snapshot=None)
+                    storageVolume = driver.create_volume(volume_size, volume_name, location=locObj, snapshot=None)
                     #<StorageVolume id=vol-0e80356132e246a7b size=1 driver=Amazon EC2>
                     data = {}
                     data['id'] = storageVolume.id
@@ -497,10 +497,10 @@ class Aws(object):
                     data['driver'] = storageVolume.driver.name
                     e[0] = data
                     # store it in mongodb
-                    db_client.perform_post(VOLUMES, data)
+                    db_client.post(VOLUME, data)
                     Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
                 else:
-                    print("Location list does not match with selected location:  ", LOCATION)
+                    print("Location list does not match with selected location:  ", location)
 
                 break
        
@@ -512,7 +512,7 @@ class Aws(object):
             
         #Fetch the list of images from db
         db_client = Pymongo_client()
-        volumes = db_client.perform_get(VOLUMES)
+        volumes = db_client.get(VOLUME)
         
         e = {}
         n = 1
@@ -525,7 +525,7 @@ class Aws(object):
 
         return volumes
 
-    def volume_list_refresh(self, printObjs):
+    def volume_list_refresh(self, print_objs):
         driver = self._get_driver()
         volumes = driver.list_volumes()
         e = {}
@@ -539,17 +539,17 @@ class Aws(object):
             e[n] = data
             n = n + 1
 
-        if printObjs == True :
+        if print_objs == True :
             Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
 
         return volumes
 
-    def volume_delete(self, VOLUME_ID):
+    def volume_delete(self, volume_id):
         driver = self._get_driver()
-        volumeObjs = self.volume_list(False)
+        volume_objs = self.volume_list(False)
         e = {}
-        for vol in volumeObjs:
-            if vol.id == VOLUME_ID :
+        for vol in volume_objs:
+            if vol.id == volume_id :
                 isDeleted = driver.destroy_volume(vol)
                 #print(vol)
                 data = {}
@@ -559,11 +559,11 @@ class Aws(object):
                 e[1] = data
                 break 
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
-        print("Is deleted - ",isDeleted)
+        Console.ok(str(Printer.dict_table(e, order=['id', 'size', 'driver'])))
+        print("Is deleted - ", isDeleted)
         return
 
-    def volume_attache(self,NODE_ID,VOLUME_ID):
+    def volume_attache(self, node_id, volume_id):
         driver = self._get_driver()
         node = ''
         volume = ''
@@ -592,14 +592,14 @@ class Aws(object):
             Console.warning("No Volumes available")
         else :
             for vol in volumes :
-                if vol.id == VOLUME_ID:
+                if vol.id == volume_id:
                     #attache the default/ 0th location node 
                     volume = vol
                     break
         print("pass -6")
         if node and volume :
             isVolumeAttached = driver.attach_volume(node, volume, device=None)
-            Console.ok("Is volume attached - ",isVolumeAttached)
+            Console.ok("Is volume attached - ", isVolumeAttached)
         else:
             Console.info("Unable to attached volume to node,  please verify your input")
 
