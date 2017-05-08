@@ -113,7 +113,7 @@ class AwsCommand(PluginCommand):
             return
 
         if arguments.vm and arguments.list :
-            aws.node_list(True)
+            aws.node_list()
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
@@ -209,6 +209,6 @@ class AwsCommand(PluginCommand):
         
         if arguments.volume and arguments.attach and arguments.VOLUME_ID :
             NODE_ID = '' # we are taking defaulr 0th created node from node list
-            aws.volume_attache(NODE_ID,arguments.VOLUME_ID)
+            aws.volume_attach(NODE_ID, arguments.VOLUME_ID)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return

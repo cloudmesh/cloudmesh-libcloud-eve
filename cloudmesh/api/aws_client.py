@@ -185,9 +185,15 @@ class Aws(object):
 
     def node_list(self):
         db_client = Evemongo_client()
-        data = db_client.get(FLAVOR)
+        nodes = db_client.get(NODE)
 
-        Console.ok(str(Printer.dict_table(data, order=['uuid', 'name', 'state', 'public_ips', 'private_ips', 'provider'])))
+        n= 1
+        e = {}
+        for node in nodes:
+            e[n] = node
+            n = n + 1
+
+        Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'provider'])))
 
         return
    
@@ -208,8 +214,8 @@ class Aws(object):
             data['uuid'] = str(node.uuid)
             data['name'] = str(node.name)
             data['state'] = str(node.state)
-            data['public_ips'] = str(node.public_ips)
-            data['private_ips'] = str(node.private_ips)
+            #data['public_ips'] = str(node.public_ips)
+            #data['private_ips'] = str(node.private_ips)
             data['provider'] = str(node.driver.name)
             e[n] = data
             n = n + 1
@@ -244,11 +250,11 @@ class Aws(object):
 
         # get driver
         driver = self._get_driver()
-        
+       
         if image_id == '' :
             image_id =  self.configd["default"]['image']#'ami-0183d861'
-         
         
+        print(image_id) 
         # Name of the existing keypair you want to use
         if keypair_name == '' :
             keypair_name = KEYPAIR_NAME_DEFAULT
@@ -256,15 +262,14 @@ class Aws(object):
         # A list of security groups you want this node to be added to
         if len(security_group_names) == 0 :
             security_group_names = ['default']
-        
+
         if flavor_id == '':
             flavor_id = self.configd["default"]['flavor']
 
         sizes = driver.list_sizes()
-        size = [s for s in sizes if s.id == flavor_id][0]
         
+        size = [s for s in sizes if s.id == flavor_id][0]
         image = driver.get_image(image_id)
-       
         # create node
         node = driver.create_node(name='test1', size = size, image = image, ex_keyname = keypair_name, ex_securitygroup = security_group_names)
         #print("The Node is Created --------------- :: ",node)
@@ -574,7 +579,7 @@ class Aws(object):
         print("Is deleted - ", isDeleted)
         return
 
-    def volume_attache(self, node_id, volume_id):
+    def volume_attach(self, node_id, volume_id):
         driver = self._get_driver()
         node = ''
         volume = ''

@@ -13,6 +13,20 @@ aws_image = {
     }
 }
 
+aws_volume = {
+    'schema': {
+        'driver': {
+            'type': 'string'
+        },
+        'id': {
+            'type': 'string'
+        },
+        'size': {
+            'type': 'integer'
+        }
+    }
+}
+
 aws_location = {
     'schema': {
         'region_name': {
@@ -61,29 +75,17 @@ aws_flavor = {
 
 aws_node = {
     'schema': {
-        'uuid': {
+        'state': {
             'type': 'string'
         },
-        'state': {
+        'uuid': {
             'type': 'string'
         },
         'name': {
             'type': 'string'
         },
-        'public_ips': {
-            'type': 'list',
-            'schema': {
-                'type': 'string'
-            }
-        },
         'provider': {
             'type': 'string'
-        },
-        'private_ips': {
-            'type': 'list',
-            'schema': {
-                'type': 'string'
-            }
         }
     }
 }
@@ -97,6 +99,7 @@ eve_settings = {
     'BANDWIDTH_SAVER': False,
     'DOMAIN': {
         'aws_image': aws_image,
+        'aws_volume': aws_volume,
         'aws_location': aws_location,
         'aws_flavor': aws_flavor,
         'aws_node': aws_node,

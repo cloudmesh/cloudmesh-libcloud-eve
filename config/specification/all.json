@@ -4,6 +4,11 @@
         "id": "ami-0180d261",
         "name": "ubuntu/images-testing/ubuntu-precise-daily-i386-server-20170123"
     },
+    "aws_volume": {
+        "driver": "Amazon EC2",
+        "id": "vol-0c30e77f6ca2a263a",
+        "size": 1
+    },
     "aws_location": {
         "region_name": "region name",
         "availability_zone": 15,
@@ -21,15 +26,9 @@
         "name": "Micro Instance"
     },
     "aws_node": {
-        "uuid": "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a",
         "state": "RUNNING",
+        "uuid": "e257efd0e6763e9fdc04b79a00f5147fcc21ee7a",
         "name": "test1",
-        "public_ips": [
-            "54.153.96.91"
-        ],
-        "provider": "provider",
-        "private_ips": [
-            "172.31.13.22"
-        ]
+        "provider": "provider"
     }
 }
