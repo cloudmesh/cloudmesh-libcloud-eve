@@ -554,7 +554,6 @@ class Aws(object):
         driver = self._get_driver()
         node = ''
         volume = ''
-        print("pass -1")
         nodes = self.node_list(False)
         if len(nodes) == 0:
             #No Node available to attache volume
@@ -563,10 +562,8 @@ class Aws(object):
         else :
             if NODE_ID == '':
                 #get the default 0th node from list
-                print("pass -2")
                 node = nodes[0]
             else:
-                print("pass -3")
                 for nd in nodes :
                     if nd.id == NODE_ID:
                         #attache the default/ 0th location node 
@@ -583,7 +580,6 @@ class Aws(object):
                     #attache the default/ 0th location node 
                     volume = vol
                     break
-        print("pass -6")
         if node and volume :
             isVolumeAttached = driver.attach_volume(node, volume, device=None)
             Console.ok("Is volume attached - ", isVolumeAttached)
