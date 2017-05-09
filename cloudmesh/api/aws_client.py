@@ -69,7 +69,7 @@ class Aws(object):
     def image_list(self):
         """List of amazon images 
         from mongodb
-        :returns: image list objects
+        :returns: None
         :rtype: NoneType
 
         """
@@ -85,7 +85,7 @@ class Aws(object):
   
         Console.ok(str(Printer.dict_table(e, order=['id', 'name', 'driver'])))
 
-        return
+        return 
 
     def image_refresh(self):
         """List of amazon images
@@ -96,7 +96,6 @@ class Aws(object):
         """
         # get driver
         driver = self._get_driver()
-        print("img refresh")
         # get image list and print
         images = driver.list_images()
         db_client = Evemongo_client()
@@ -107,8 +106,8 @@ class Aws(object):
         else:
             #r = db_client.delete(IMAGE)
             #print(images)
-            print("storing in db")
-            db_client.perform_delete(IMAGE)
+            #print("storing in db")
+            #db_client.perform_delete(IMAGE)
             n = 0 ;
             e = {}
             for image in images:
@@ -129,10 +128,9 @@ class Aws(object):
         return
 
     def flavor_list(self):
-        
         """List of amazon images
         get store it in db
-        :returns: flavor list object
+        :returns: None
         :rtype: NoneType
 
         """
@@ -151,6 +149,12 @@ class Aws(object):
         return
         
     def flavor_refresh(self):
+        """
+        List all the flavor list
+        available on Amazon EC2
+        :returns: None
+        :rtype: NoneType
+        """
         #get driver
         driver = self._get_driver()
 
@@ -184,6 +188,12 @@ class Aws(object):
 
 
     def node_list(self):
+        """
+        List all the nodes
+        stored in db
+        :returns: None
+        :rtype: NoneType
+        """
         db_client = Evemongo_client()
         nodes = db_client.get(NODE)
 
@@ -198,6 +208,12 @@ class Aws(object):
         return
    
     def node_refresh(self, show_list):
+        """
+        List the all instance
+        of node
+        :returns: nodes object
+        :rtype: NoneType
+        """
         # get driver
         driver = self._get_driver()
         #List the running vm's
@@ -245,7 +261,15 @@ class Aws(object):
    #     return""" 
     
     def node_create_by_imageId(self, image_id, keypair_name, security_group_names, flavor_id):
-
+        """
+        Created the node with
+        specified image id, 
+        keypair name should be AWS1
+        rest of the parameter; security group
+        and flavor id are take bydefault
+        :returns: None
+        :rtype: NoneType
+        """
         # get driver
         driver = self._get_driver()
         db_client = Evemongo_client()
@@ -290,8 +314,16 @@ class Aws(object):
         return
     
     def node_reboot(self, node_uuid):
-        
+        """
+        To reboot the node,
+        reboot time specific to
+        created node configuration
+        :returns: None
+        :rtype: NoneType
+        """
         driver = self._get_driver()
+        db_client = Evemongo_client()
+        
         #Take the running node list
         nodes = self.node_refresh(False)
         node = {}
@@ -321,9 +353,16 @@ class Aws(object):
             if isNodeReboot :
                 #Delete the node from db as well
                 print("Node deleted from db")
+                #db_client.delete(NODE)
         return        
 
     def node_delete(self, node_uuid):
+        """
+        Delete the node who's 
+        node_uuid is mentioned
+        :returns: None
+        :rtype: NoneType
+        """
         # get driver
         #print("getting vm list")
         driver = self._get_driver()
@@ -363,6 +402,8 @@ class Aws(object):
         """
         Creates the key pair 
         required for node object
+        :returns: None
+        :rtype: NoneType
         """
         driver = self._get_driver()
         
@@ -388,6 +429,8 @@ class Aws(object):
     def keypair_delete(self, key_pair):
         """
         deletes the created key pair 
+        :returns: None
+        :rtype: NoneType
         """
         driver = self._get_driver()
         #Get the keypair object
@@ -406,7 +449,7 @@ class Aws(object):
         n = n + 1
           
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
-        print("Is deleted !!")
+        #print("Is deleted !!")
         return
         
     def keypair_refresh(self):
@@ -414,6 +457,8 @@ class Aws(object):
         List all the available key pair
         associated with account
         """
+        :returns: None
+        :rtype: NoneType
         driver = self._get_driver()
         
         db_client = Evemongo_client()
@@ -436,6 +481,12 @@ class Aws(object):
         return
 
     def keypair_list(self):
+        """
+        List all the keypairs
+        stored in db
+        :returns: None
+        :rtype: NoneType
+        """
         db_client = Evemongo_client()
         keys = db_client.get(KEYPAIR)
         n= 1
@@ -445,12 +496,15 @@ class Aws(object):
             n = n + 1
 
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
-    
+        
+        return
 
     def keypair_get(self, key_pair):
         """
         Get the keypair object 
         associated with name
+        :returns: keypar object
+        :rtype: NoneType
         """
         driver = self._get_driver()
         
@@ -469,6 +523,8 @@ class Aws(object):
         """
         List all
         available locations
+        :returns: location objects
+        :rtype: NoneType
         """
         driver = self._get_driver()
         locations = driver.list_locations()
@@ -497,6 +553,12 @@ class Aws(object):
         return locations
         
     def location_list(self):
+        """
+        List out all the available location 
+        for the associated account
+        :returns: None
+        :rtype: NoneType
+        """
         db_client = Evemongo_client()
         locations = db_client.get(LOCATION)
         n = 1
@@ -507,8 +569,17 @@ class Aws(object):
 
         Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
 
-    
+        return
+        
     def volume_create(self, volume_size, volume_name):
+        """
+        Creates the volume with default 
+        size of 1GB with specified volume name
+        location for volume will be fetch from
+        ../cloudmesh.yaml file
+        :returns: None
+        :rtype: NoneType
+        """
         #Some test functionality
         db_client = Evemongo_client()
         #Some test functionality
@@ -546,7 +617,12 @@ class Aws(object):
         return
 
     def volume_list(self, print_objs):
-            
+        """
+        List all the successfuly stored
+        volumes
+        :returns: None
+        :rtype: NoneType
+        """
         #Fetch the list of images from db
         db_client = Evemongo_client()
         volumes = db_client.get(VOLUME)
@@ -563,6 +639,12 @@ class Aws(object):
         return volumes
 
     def volume_refresh(self, print_objs):
+        """
+        List all the successfuly created
+        volumes 
+        :returns: volumes object
+        :rtype: NoneType
+        """
         driver = self._get_driver()
         volumes = driver.list_volumes()
         db_client = Evemongo_client()
@@ -585,6 +667,12 @@ class Aws(object):
         return volumes
 
     def volume_delete(self, volume_id):
+        """
+        Deletes the volumes
+        with specified volume_id
+        :returns: None
+        :rtype: NoneType
+        """
         driver = self._get_driver()
         volume_objs = self.volume_refresh(False)
         e = {}
@@ -604,13 +692,19 @@ class Aws(object):
         return
 
     def volume_attach(self, node_id, volume_id):
+        """
+        Function will attached the mentioned volume
+        (by volume id) to the node
+        :returns: None
+        :rtype: NoneType
+        """
         driver = self._get_driver()
         node = ''
         volume = ''
         nodes = self.node_refresh(False)
         if len(nodes) == 0:
             #No Node available to attache volume
-            print("pass -No Node")
+            #print("pass -No Node")
             Console.warning("No Node available to attache volume")
         else :
             if NODE_ID == '':
