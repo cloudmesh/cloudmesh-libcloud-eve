@@ -28,7 +28,6 @@ from cloudmesh.common.Printer import Printer
 
 # Database modules
 import json
-from cloudmesh.api.pymongo_client import Pymongo_client
 from cloudmesh.api.evemongo_client import Evemongo_client
 #######################################################################
 # GLOBALS
@@ -456,11 +455,11 @@ class Aws(object):
         """
         List all the available key pair
         associated with account
-        """
+        
         :returns: None
         :rtype: NoneType
         driver = self._get_driver()
-        
+        """
         db_client = Evemongo_client()
         db_client.delete(KEYPAIR)
 
