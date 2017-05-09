@@ -183,7 +183,7 @@ class AwsCommand(PluginCommand):
             return
         
         if arguments.location and arguments.list:
-            aws.location_list()
+            aws.location_list(True)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
@@ -200,11 +200,12 @@ class AwsCommand(PluginCommand):
             return
         
         if arguments.volume and arguments.list:
-            if arguments.refresh or refresh == "on":
-                volume_refresh(True)
-            else:
-                aws.volume_list(True)
+            aws.volume_list(True)
             
+            Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
+            return
+        if arguments.volume and arguments.refresh:
+            aws.volume_refresh(True)
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 

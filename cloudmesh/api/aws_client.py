@@ -442,13 +442,12 @@ class Aws(object):
         e = {}
         # parse flavors
         data = {}
-        data['name'] = str(kp_obj.name)
-        data['fingerprint'] = str(kp_obj.fingerprint)
+        data['name'] = str(key_pair_obj.name)
+        data['fingerprint'] = str(key_pair_obj.fingerprint)
         e[n] = data
         n = n + 1
-          
-        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
-        #print("Is deleted !!")
+        print("Is deleted........",kp_obj)
+
         return
         
     def keypair_refresh(self):
@@ -458,8 +457,8 @@ class Aws(object):
         
         :returns: None
         :rtype: NoneType
-        driver = self._get_driver()
         """
+        driver = self._get_driver()
         db_client = Evemongo_client()
         db_client.delete(KEYPAIR)
 
@@ -472,7 +471,6 @@ class Aws(object):
             data['fingerprint'] = kp.fingerprint
             e[n] = data
             n = n + 1
-
             db_client.post(KEYPAIR, data)        
             
         Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
@@ -508,14 +506,18 @@ class Aws(object):
         driver = self._get_driver()
         
         e = {}
-        key_pair_obj = driver.get_key_pair(key_pair)
-        data = {}
-        data['name'] = key_pair_obj.name
-        data['fingerprint'] = key_pair_obj.fingerprint
-        e[1] = data
-
-        Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
-       
+        key_pair_obj= {}
+        try:
+            key_pair_obj = driver.get_key_pair(key_pair)
+        except Exception:
+            Console.error("Key does not exist")
+        else:
+            data = {}
+            data['name'] = key_pair_obj.name
+            data['fingerprint'] = key_pair_obj.fingerprint
+            e[1] = data
+            Console.ok(str(Printer.dict_table(e, order=['name', 'fingerprint'])))
+            
         return key_pair_obj
 
     def location_refresh(self, print_location):
@@ -551,7 +553,7 @@ class Aws(object):
         
         return locations
         
-    def location_list(self):
+    def location_list(self,print_location):
         """
         List out all the available location 
         for the associated account
@@ -565,10 +567,10 @@ class Aws(object):
         for location in locations:
             e[n] = location
             n = n + 1
+        if print_location:
+            Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
 
-        Console.ok(str(Printer.dict_table(e, order=['id','name','country', 'availability_zone', 'zone_state','region_name','provider'])))
-
-        return
+        return locations
         
     def volume_create(self, volume_size, volume_name):
         """
@@ -587,7 +589,7 @@ class Aws(object):
         driver = self._get_driver()
         sizes = driver.list_sizes()
         size = [s for s in sizes if s.id == flavor_id][0]
-        locations = self.location_list(False)
+        locations = self.location_refresh(False)
         if len(locations) == 0:
             print("Location not found!!")
         else:
@@ -675,6 +677,7 @@ class Aws(object):
         driver = self._get_driver()
         volume_objs = self.volume_refresh(False)
         e = {}
+        isDeleted = False
         for vol in volume_objs:
             if vol.id == volume_id :
                 isDeleted = driver.destroy_volume(vol)
