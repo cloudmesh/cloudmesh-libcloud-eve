@@ -248,11 +248,11 @@ class Aws(object):
 
         # get driver
         driver = self._get_driver()
-       
+        db_client = Evemongo_client()
         if image_id == '' :
             image_id =  self.configd["default"]['image']#'ami-0183d861'
         
-        print(image_id) 
+        #print(image_id) 
         # Name of the existing keypair you want to use
         if keypair_name == '' :
             keypair_name = KEYPAIR_NAME_DEFAULT
@@ -286,7 +286,7 @@ class Aws(object):
 
         if bool(node) :
             #Push the created node in db
-            print("Stored in db")
+            db_client.post(NODE, data)
         return
     
     def node_reboot(self, node_uuid):

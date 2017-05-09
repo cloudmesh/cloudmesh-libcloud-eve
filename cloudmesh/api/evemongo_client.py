@@ -22,7 +22,7 @@ class Evemongo_client(object):
     @classmethod
     def post(cls, resource, data):
         headers = {'Content-Type': 'application/json'}
-        print(json.dumps(data, indent = 4).replace('\uff0e', '.'))
+        #print(json.dumps(data, indent = 4).replace('\uff0e', '.'))
         return requests.post(cls.endpoint(resource), json.dumps(data, indent = 4).replace('\uff0e', '.'), headers=headers)
 
     @classmethod
