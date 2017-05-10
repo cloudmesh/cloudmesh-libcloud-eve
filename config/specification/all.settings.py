@@ -105,6 +105,7 @@ eve_settings = {
     'MONGO_DBNAME': 'testing',
     'RESOURCE_METHODS': ['GET', 'POST', 'DELETE'],
     'BANDWIDTH_SAVER': False,
+    'PAGINATION': False,
     'DOMAIN': {
         'aws_image': aws_image,
         'aws_volume': aws_volume,
