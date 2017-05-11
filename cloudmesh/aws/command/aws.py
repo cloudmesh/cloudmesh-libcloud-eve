@@ -129,6 +129,7 @@ class AwsCommand(PluginCommand):
         if arguments.vm and arguments.reboot and arguments.NODE_UUID :
             NODE_UUID = arguments.NODE_UUID
             aws.node_reboot(NODE_UUID)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             
 
@@ -139,56 +140,65 @@ class AwsCommand(PluginCommand):
             SECURITY_GROUP_NAMES = []
             FLAVOR_ID = ''
             aws.node_create_by_imageId(SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
-            #aws.node_create_by_profile(SEL_IMAGE_ID)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
  
         if arguments.vm and arguments.delete and arguments.UUID:
             NODE_UUID =  arguments.UUID #'61671593de3681e7de6bd6c6e33f5a4857110864'
             aws.node_delete(NODE_UUID)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.keypair and arguments.create and arguments.NAME:
             KEY_PAIR = arguments.NAME #"AWS3"
             aws.keypair_create(KEY_PAIR)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.keypair and arguments.delete and arguments.NAME:
             KEY_PAIR = arguments.NAME # "AWS1"
             aws.keypair_delete(KEY_PAIR)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.keypair and arguments.list :
             aws.keypair_list()
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.keypair and arguments.refresh :
             aws.keypair_refresh()
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.keypair and arguments.get and arguments.NAME :
             KEY_PAIR =  arguments.NAME #"AWS2"
             aws.keypair_get(KEY_PAIR)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
             
         if arguments.drop and arguments.collections :
             aws.drop_collections()
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.location and arguments.list:
             aws.location_list(True)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.location and arguments.refresh:
             aws.location_refresh(True)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
           
@@ -196,26 +206,31 @@ class AwsCommand(PluginCommand):
             VOLUME_SIZE = 1 # Size of volume in gigabytes (required)
             VOLUME_NAME =  arguments.VOLUME_NAME # Name of the volume to be created
             aws.volume_create(VOLUME_SIZE,VOLUME_NAME)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.volume and arguments.list:
             aws.volume_list(True)
-            
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
+
         if arguments.volume and arguments.refresh:
             aws.volume_refresh(True)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
         if arguments.volume and arguments.delete and arguments.VOLUME_ID :
             aws.volume_delete(arguments.VOLUME_ID)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
         
         if arguments.volume and arguments.attach and arguments.VOLUME_ID :
             NODE_ID = '' # we are taking defaulr 0th created node from node list
             aws.volume_attach(NODE_ID, arguments.VOLUME_ID)
+            stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
