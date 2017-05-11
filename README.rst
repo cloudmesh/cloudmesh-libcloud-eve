@@ -49,8 +49,9 @@ To install them simply to the following::
 Configuration
 ------------------
 
-The AWS credentials are read from configuration file config/aws.yml. It also
-contains the default configuration for a creating a vm node.
+The AWS credentials are read from configuration file ../cloudmesh.yaml. It also
+contains the default configuration for a creating a vm node. Value of flavor, image and location is
+set to default. User can change according to need.
 
 You will have to do the following modifications to match you machine::
 
@@ -58,9 +59,9 @@ You will have to do the following modifications to match you machine::
       EC2_ACCESS_KEY: 'ACCESS KEY'
       EC2_SECRET_KEY: 'SECRET KEY'
     default:
-      image: 'IMAGE ID'
-      size: 'SIZE ID'
-      region: 'REGION'
+      flavor: t2.micro
+      image: ami-0183d861
+      location: us-west-1
 
 The mongodb configuration and collection schema are stored in config/specification/all.settings.py.
 The rest srvices can be started using that by following command::
