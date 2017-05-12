@@ -15,14 +15,17 @@ aws_image = {
 
 aws_volume = {
     'schema': {
+        'size': {
+            'type': 'integer'
+        },
         'driver': {
             'type': 'string'
         },
         'id': {
             'type': 'string'
         },
-        'size': {
-            'type': 'integer'
+        'name': {
+            'type': 'string'
         }
     }
 }

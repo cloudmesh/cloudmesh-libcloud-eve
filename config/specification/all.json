@@ -5,9 +5,10 @@
         "name": "ubuntu/images-testing/ubuntu-precise-daily-i386-server-20170123"
     },
     "aws_volume": {
+        "size": 1,
         "driver": "Amazon EC2",
         "id": "vol-0c30e77f6ca2a263a",
-        "size": 1
+        "name": "test1"
     },
     "aws_location": {
         "name": "us-west-1a",
