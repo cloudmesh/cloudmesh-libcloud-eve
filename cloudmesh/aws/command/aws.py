@@ -42,8 +42,8 @@ class AwsCommand(PluginCommand):
             aws volume create VOLUME_NAME
             aws volume list
             aws volume refresh
-            aws volume delete VOLUME_ID
-            aws volume attach VOLUME_ID
+            aws volume delete VOLUME_NAME
+            aws volume attach VOLUME_NAME
             aws drop collections
 
           Arguments:
@@ -222,8 +222,8 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
 
-        if arguments.volume and arguments.delete and arguments.VOLUME_ID :
-            aws.volume_delete(arguments.VOLUME_ID)
+        if arguments.volume and arguments.delete and arguments.VOLUME_NAME :
+            aws.volume_delete(arguments.VOLUME_NAME)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
