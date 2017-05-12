@@ -602,12 +602,13 @@ class Aws(object):
                     #<StorageVolume id=vol-0e80356132e246a7b size=1 driver=Amazon EC2>
                     data = {}
                     data['id'] = storageVolume.id
+                    data['name'] = volume_name
                     data['size'] = storageVolume.size
                     data['driver'] = storageVolume.driver.name
                     e[0] = data
                     # store it in mongodb
                     db_client.post(VOLUME, data)
-                    Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+                    Console.ok(str(Printer.dict_table(e, order=['id','name', 'size','driver'])))
                 else:
                     print("Location list does not match with selected location:  ", location)
 
@@ -635,7 +636,7 @@ class Aws(object):
             n = n + 1
 
         if print_objs == True :
-            Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+            Console.ok(str(Printer.dict_table(e, order=['id','name', 'size','driver'])))
 
         return volumes
 
@@ -656,6 +657,7 @@ class Aws(object):
             #print(vol)
             data = {}
             data['id'] = vol.id
+            data['name'] = vol.name
             data['size'] = vol.size
             data['driver'] = vol.driver.name
             e[n] = data
@@ -663,14 +665,14 @@ class Aws(object):
             db_client.post(VOLUME, data)
 
         if print_objs == True :
-            Console.ok(str(Printer.dict_table(e, order=['id', 'size','driver'])))
+            Console.ok(str(Printer.dict_table(e, order=['id','name', 'size','driver'])))
 
         return volumes
 
-    def volume_delete(self, volume_id):
+    def volume_delete(self, volume_name):
         """
         Deletes the volumes
-        with specified volume_id
+        with specified volume_name
         :returns: None
         :rtype: NoneType
         """
@@ -679,17 +681,18 @@ class Aws(object):
         e = {}
         isDeleted = False
         for vol in volume_objs:
-            if vol.id == volume_id :
+            if vol.name == volume_name :
                 isDeleted = driver.destroy_volume(vol)
                 #print(vol)
                 data = {}
                 data['id'] = vol.id
+                data['name'] = vol.name
                 data['size'] = vol.size
                 data['driver'] = vol.driver.name
                 e[1] = data
                 break 
 
-        Console.ok(str(Printer.dict_table(e, order=['id', 'size', 'driver'])))
+        Console.ok(str(Printer.dict_table(e, order=['id','name', 'size', 'driver'])))
         print("Is deleted - ", isDeleted)
         return
 
