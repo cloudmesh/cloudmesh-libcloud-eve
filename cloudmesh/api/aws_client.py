@@ -259,7 +259,7 @@ class Aws(object):
 
    #     return""" 
     
-    def node_create_by_imageId(self, image_id, keypair_name, security_group_names, flavor_id):
+    def node_create_by_imageId(self, vm_name,image_id, keypair_name, security_group_names, flavor_id):
         """
         Created the node with
         specified image id, 
@@ -292,7 +292,7 @@ class Aws(object):
         size = [s for s in sizes if s.id == flavor_id][0]
         image = driver.get_image(image_id)
         # create node
-        node = driver.create_node(name='test1', size = size, image = image, ex_keyname = keypair_name, ex_securitygroup = security_group_names)
+        node = driver.create_node(name=vm_name, size = size, image = image, ex_keyname = keypair_name, ex_securitygroup = security_group_names)
         #print("The Node is Created --------------- :: ",node)
         n = 0 ;
         e = {}
@@ -312,7 +312,7 @@ class Aws(object):
             db_client.post(NODE, data)
         return
     
-    def node_reboot(self, node_uuid):
+    def node_reboot(self, node_name):
         """
         To reboot the node,
         reboot time specific to
@@ -327,12 +327,12 @@ class Aws(object):
         nodes = self.node_refresh(False)
         node = {}
         for n in nodes:
-            if n.uuid == node_uuid:
+            if n.name == node_name:
                 node = n
                 break
 
         if bool(node) == False:
-            print("No node found to reboot")
+            Console.error("No node found to reboot")
         else:
             if node.state == NodeState.RUNNING:
                 isNodeReboot = node.reboot()
@@ -355,10 +355,10 @@ class Aws(object):
                 #db_client.delete(NODE)
         return        
 
-    def node_delete(self, node_uuid):
+    def node_delete(self, node_name):
         """
         Delete the node who's 
-        node_uuid is mentioned
+        node_name is mentioned
         :returns: None
         :rtype: NoneType
         """
@@ -372,29 +372,32 @@ class Aws(object):
         nodes = self.node_refresh(False)
         node = {}
         for n in nodes:
-            if n.uuid == node_uuid:
+            if n.name == node_name:
                 node = n
-
-        if bool(node) == False:
-            print("No node found to delete")
+        
+        if node:
+            if bool(node) == False:
+                print("No node found to delete")
+            else:
+                isNodeDelete = driver.destroy_node(node)
+                n = 0 ;
+                e = {}
+                data = {}
+                data['uuid'] = str(node.uuid)
+                data['name'] = str(node.name)
+                data['state'] = str(node.state)
+                data['public_ips'] = str(node.public_ips)
+                data['private_ips'] = str(node.private_ips)
+                data['provider'] = str(node.driver.name)
+                e[n] = data
+                n = n + 1
+                Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
+                print("Deleted Node is ---------------",isNodeDelete)
+                if isNodeDelete :
+                    #Delete the node from db as well
+                    print("Node deleted from db")
         else:
-            isNodeDelete = driver.destroy_node(node)
-            n = 0 ;
-            e = {}
-            data = {}
-            data['uuid'] = str(node.uuid)
-            data['name'] = str(node.name)
-            data['state'] = str(node.state)
-            data['public_ips'] = str(node.public_ips)
-            data['private_ips'] = str(node.private_ips)
-            data['provider'] = str(node.driver.name)
-            e[n] = data
-            n = n + 1
-            Console.ok(str(Printer.dict_table(e, order=['uuid', 'name', 'state', 'public_ips', 'private_ips','provider'])))
-            print("Deleted Node is ---------------",isNodeDelete)
-            if isNodeDelete :
-                #Delete the node from db as well
-                print("Node deleted from db")
+            Console.error("No such VM running at the movement")
         return        
         
     def keypair_create(self, key_pair):
