@@ -23,13 +23,13 @@ class AwsCommand(PluginCommand):
             aws refresh ON
             aws api URL
             aws default image ON
-            aws image refresh [--format=FORMAT]
+            aws image [refresh] [--format=FORMAT]
             aws image list [--format=FORMAT]
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws vm boot IMAGE_NAME [--image_id=IMAGE_ID] [--flavor_id=FLAVOR_ID] [--keypair_name=KEYPAIR_NAME] [--sec_grp_name=SEC_GRP_NAMES]
+            aws vm boot NODE_NAME [--image_id=IMAGE_ID] [--flavor_id=FLAVOR_ID] [--keypair_name=KEYPAIR_NAME] [--sec_grp_name=SEC_GRP_NAMES]
             aws vm reboot NODE_NAME
-            aws vm delete NAME
+            aws vm delete NODE_NAME
             aws vm list [--format=FORMAT]
             aws vm refresh [--format=FORMAT]
             aws keypair create NAME
@@ -133,7 +133,7 @@ class AwsCommand(PluginCommand):
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             
 
-        if arguments.vm and arguments.boot and arguments.IMAGE_NAME :
+        if arguments.vm and arguments.boot and arguments.NODE_NAME :
             #SEL_IMAGE_ID = 'ami-0183d861' #ami-d85e75b0
             config = {}
             if arguments.IMAGE_ID:
@@ -148,14 +148,14 @@ class AwsCommand(PluginCommand):
             if arguments.FLAVOR_ID:
                 config["flavor_id"] = arguments.FLAVOR_ID
 
-            aws.node_create_by_imageId(arguments.IMAGE_NAME , config)
+            aws.node_create_by_imageId(arguments.NODE_NAME , config)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
  
-        if arguments.vm and arguments.delete and arguments.NAME:
-            NODE_NAME =  arguments.NAME #'61671593de3681e7de6bd6c6e33f5a4857110864'
-            aws.node_delete(NODE_NAME)
+        if arguments.vm and arguments.delete and arguments.NODE_NAME:
+            node_name =  arguments.NAME #'61671593de3681e7de6bd6c6e33f5a4857110864'
+            aws.node_delete(node_name)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
