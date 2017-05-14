@@ -259,7 +259,7 @@ class Aws(object):
 
    #     return""" 
     
-    def node_create_by_imageId(self, vm_name,image_id, keypair_name, security_group_names, flavor_id):
+    def node_create_by_imageId(self, vm_name, config):#image_id, keypair_name, security_group_names, flavor_id):
         """
         Created the node with
         specified image id, 
@@ -272,20 +272,28 @@ class Aws(object):
         # get driver
         driver = self._get_driver()
         db_client = Evemongo_client()
-        if image_id == '' :
+        if "image_id" not in config :
             image_id =  self.configd["default"]['image']#'ami-0183d861'
+        else:
+            image_id = config["image_id"]
         
         #print(image_id) 
         # Name of the existing keypair you want to use
-        if keypair_name == '' :
+        if keypair_name not in config:
             keypair_name = KEYPAIR_NAME_DEFAULT
+        else:
+            keypair_name = config["keypair_name"]
 
         # A list of security groups you want this node to be added to
-        if len(security_group_names) == 0 :
+        if "security_group_names" not in config:
             security_group_names = ['default']
+        else:
+            security_group_names = config["security_group_names"]
 
-        if flavor_id == '':
+        if "flavor_id" not in config:
             flavor_id = self.configd["default"]['flavor']
+        else:
+            flavor_id = config["flavor_id"]
 
         sizes = driver.list_sizes()
         

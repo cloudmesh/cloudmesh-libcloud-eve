@@ -27,7 +27,7 @@ class AwsCommand(PluginCommand):
             aws image list [--format=FORMAT]
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws vm boot IMAGE_NAME
+            aws vm boot IMAGE_NAME [--image_id=IMAGE_ID] [--flavor_id=FLAVOR_ID] [--keypair_name=KEYPAIR_NAME] [--sec_grp_name=SEC_GRP_NAMES]
             aws vm reboot NODE_NAME
             aws vm delete NAME
             aws vm list [--format=FORMAT]
@@ -134,11 +134,21 @@ class AwsCommand(PluginCommand):
             
 
         if arguments.vm and arguments.boot and arguments.IMAGE_NAME :
-            SEL_IMAGE_ID = 'ami-0183d861' #ami-d85e75b0
-            KEYPAIR_NAME = 'AWS1'
-            SECURITY_GROUP_NAMES = []
-            FLAVOR_ID = ''
-            aws.node_create_by_imageId(arguments.IMAGE_NAME , SEL_IMAGE_ID,KEYPAIR_NAME,SECURITY_GROUP_NAMES,FLAVOR_ID)
+            #SEL_IMAGE_ID = 'ami-0183d861' #ami-d85e75b0
+            config = {}
+            if arguments.IMAGE_ID:
+                config["image_id"] = arguments.IMAGE_ID
+
+            if arguments.KEYPAIR_NAME:
+                config["keypair_name"] = arguments.KEYPAIR_NAME
+
+            if arguments.SEC_GRP_NAMES:
+                config["security_group_names"] = arguments.SEC_GRP_NAMES
+
+            if arguments.FLAVOR_ID:
+                config["flavor_id"] = arguments.FLAVOR_ID
+
+            aws.node_create_by_imageId(arguments.IMAGE_NAME , config)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return
