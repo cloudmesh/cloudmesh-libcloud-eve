@@ -8,7 +8,6 @@ from cloudmesh.common.StopWatch import StopWatch
 from cloudmesh.common.default import Default
 
 from cloudmesh.common.StopWatch import StopWatch
-
 #Console printing packages
 from cloudmesh.common.console import Console
 
@@ -27,7 +26,7 @@ class AwsCommand(PluginCommand):
             aws image list [--format=FORMAT]
             aws flavor [refresh] [--format=FORMAT]
             aws flavor list [--format=FORMAT]
-            aws vm boot NODE_NAME [--image_id=IMAGE_ID] [--flavor_id=FLAVOR_ID] [--keypair_name=KEYPAIR_NAME] [--sec_grp_name=SEC_GRP_NAMES]
+            aws vm boot NODE_NAME [--image_id=IMAGE_ID] [--flavor_id=FLAVOR_ID] [--keypair_name=KEYPAIR_NAME]
             aws vm reboot NODE_NAME
             aws vm delete NODE_NAME
             aws vm list [--format=FORMAT]
@@ -135,20 +134,26 @@ class AwsCommand(PluginCommand):
 
         if arguments.vm and arguments.boot and arguments.NODE_NAME :
             #SEL_IMAGE_ID = 'ami-0183d861' #ami-d85e75b0
+            arguments.IMAGE_ID = arguments["--image_id"]
+            arguments.FLAVOR_ID = arguments["--flavor_id"]
+            arguments.KEYPAIR_NAME = arguments["--keypair_name"]
             config = {}
             if arguments.IMAGE_ID:
                 config["image_id"] = arguments.IMAGE_ID
+            
+            if arguments.FLAVOR_ID:
+                config["flavor_id"] = arguments.FLAVOR_ID
 
             if arguments.KEYPAIR_NAME:
                 config["keypair_name"] = arguments.KEYPAIR_NAME
 
-            if arguments.SEC_GRP_NAMES:
-                config["security_group_names"] = arguments.SEC_GRP_NAMES
+            # if arguments.SEC_GRP_NAMES:
+            #     config["security_group_names"] = arguments.SEC_GRP_NAMES
 
-            if arguments.FLAVOR_ID:
-                config["flavor_id"] = arguments.FLAVOR_ID
+            
 
-            aws.node_create_by_imageId(arguments.NODE_NAME , config)
+           
+            aws.node_create_by_imageId(arguments.NODE_NAME,config)
             stopwatch.stop('E2E')
             Console.ok('Execution Time:' + str(stopwatch.get('E2E')))
             return

@@ -279,7 +279,7 @@ class Aws(object):
         
         #print(image_id) 
         # Name of the existing keypair you want to use
-        if keypair_name not in config:
+        if "keypair_name" not in config:
             keypair_name = KEYPAIR_NAME_DEFAULT
         else:
             keypair_name = config["keypair_name"]
